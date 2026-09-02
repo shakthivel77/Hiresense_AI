@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0B0F14;
+  --bg-surface: #111820;
+  --bg-elevated: #17212B;
+  --text-primary: #F3F6FA;
+  --text-muted: #94A3B8;
+  --accent-primary: #38BDF8;
+  --accent-secondary: #A78BFA;
+  --border-default: #263241;
+  --state-error: #F87171;
+  --state-warning: #FBBF24;
+  --state-success: #34D399;
+  --state-locked: #64748B;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
