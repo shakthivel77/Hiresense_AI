@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { RoadmapView } from './components/roadmap';
 import { PortfolioView } from './components/portfolio';
+import { JobAnalyzerView } from './components/career';
+import { MockInterviewView } from './components/interview';
 import { Terminal, Shield, Cpu, BookOpen, Award, Target, MessageSquare, BarChart3, LogIn, LogOut, UserCheck, ArrowRight } from 'lucide-react';
 
 type NavView = 'dashboard' | 'roadmap' | 'assessment' | 'career' | 'interview' | 'leaderboard';
@@ -17,6 +19,7 @@ interface HealthStatus {
 
 function MainApp() {
   const [activeView, setActiveView] = useState<NavView>('dashboard');
+  const [roadmapTarget, setRoadmapTarget] = useState<{ domainSlug?: string; skillId?: string } | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -138,9 +141,26 @@ function MainApp() {
         {/* Dynamic View Body */}
         <div className="p-6 max-w-6xl mx-auto w-full flex-1">
           {activeView === 'roadmap' ? (
-            <RoadmapView />
+            <RoadmapView
+              initialDomainSlug={roadmapTarget?.domainSlug}
+              initialSkillId={roadmapTarget?.skillId}
+            />
           ) : activeView === 'assessment' ? (
             <PortfolioView />
+          ) : activeView === 'career' ? (
+            <JobAnalyzerView
+              onNavigateToRoadmap={(domainSlug, skillId) => {
+                setRoadmapTarget({ domainSlug, skillId });
+                setActiveView('roadmap');
+              }}
+            />
+          ) : activeView === 'interview' ? (
+            <MockInterviewView
+              onNavigateToRoadmap={(domainSlug, skillId) => {
+                setRoadmapTarget({ domainSlug, skillId });
+                setActiveView('roadmap');
+              }}
+            />
           ) : activeView === 'dashboard' ? (
             <div className="space-y-6">
               <div className="bg-surface rounded-xl p-6 border border-border">

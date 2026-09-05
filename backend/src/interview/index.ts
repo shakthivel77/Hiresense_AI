@@ -1,2 +1,6 @@
-// Interview module boundary placeholder (Phase 6)
-export const INTERVIEW_MODULE_VERSION = '0.1.0';
+export * from './types.js';
+export * from './interviewQuestionBankService.js';
+export * from './interviewSessionService.js';
+export * from './interviewEvaluatorService.js';
+export * from './starFeedbackFormatterService.js';
+export * from './routes.js';

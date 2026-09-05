@@ -8,10 +8,18 @@ import { SkillDetailModal } from './SkillDetailModal';
 import { TimedAssessmentModal } from '../assessment/TimedAssessmentModal';
 import { GitBranch, Filter, Layers, AlertCircle, RefreshCw, CheckCircle2, Lock, PlayCircle } from 'lucide-react';
 
-export const RoadmapView: React.FC = () => {
+interface RoadmapViewProps {
+  initialDomainSlug?: string;
+  initialSkillId?: string;
+}
+
+export const RoadmapView: React.FC<RoadmapViewProps> = ({
+  initialDomainSlug,
+  initialSkillId,
+}) => {
   const { token } = useAuth();
   const [domains, setDomains] = useState<DomainDTO[]>([]);
-  const [selectedDomainSlug, setSelectedDomainSlug] = useState<string | null>(null);
+  const [selectedDomainSlug, setSelectedDomainSlug] = useState<string | null>(initialDomainSlug || null);
   const [graphData, setGraphData] = useState<RoadmapGraphData | null>(null);
   const [loadingDomains, setLoadingDomains] = useState(true);
   const [loadingGraph, setLoadingGraph] = useState(false);
@@ -37,13 +45,21 @@ export const RoadmapView: React.FC = () => {
     fetchRoadmapGraph(slug, token)
       .then((data) => {
         setGraphData(data);
+        if (initialSkillId && data.nodes) {
+          const matched = data.nodes.find(
+            (n) => n.skill.id === initialSkillId || n.skill.slug === initialSkillId
+          );
+          if (matched) {
+            setSelectedNode(matched);
+          }
+        }
         setLoadingGraph(false);
       })
       .catch((err) => {
         setError(err.message || 'Failed to load roadmap graph');
         setLoadingGraph(false);
       });
-  }, [token]);
+  }, [token, initialSkillId]);
 
   // Load domain list on mount
   useEffect(() => {
@@ -55,8 +71,8 @@ export const RoadmapView: React.FC = () => {
       .then((data) => {
         if (!isMounted) return;
         setDomains(data);
-        if (data.length > 0) {
-          setSelectedDomainSlug(data[0].slug);
+        if (data.length > 0 && !selectedDomainSlug) {
+          setSelectedDomainSlug(initialDomainSlug || data[0].slug);
         }
         setLoadingDomains(false);
       })
@@ -69,7 +85,7 @@ export const RoadmapView: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialDomainSlug, selectedDomainSlug]);
 
   // Load roadmap graph whenever selected domain slug or auth token changes
   useEffect(() => {

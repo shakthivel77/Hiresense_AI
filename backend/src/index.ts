@@ -10,6 +10,7 @@ import { resourcesRouter } from './resources/index.js';
 import { assessmentRouter } from './assessment/index.js';
 import { portfolioRouter } from './portfolio/index.js';
 import { careerRouter } from './career/index.js';
+import { interviewRouter } from './interview/index.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/resources', resourcesRouter);
 app.use('/api/assessment', assessmentRouter);
 app.use('/api/portfolio', portfolioRouter);
 app.use('/api/career', careerRouter);
+app.use('/api/interview', interviewRouter);
 
 
 // Health check endpoint

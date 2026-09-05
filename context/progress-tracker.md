@@ -4,12 +4,13 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Phase 4 — Job Analyzer Engine
-- Status: In Progress (Units 01–31 Completed)
+- Phase 5 — Interview Prep Engine (COMPLETE)
+- Next: Phase 6 — Skill Graph Visualizer
+- Status: In Progress (Units 01–38 Completed)
 
 ## Current Goal
 
-- Implement Job Match & Gap UI (Unit 32).
+- Implement Canvas & Node Render Model (Unit 39).
 
 ## Completed
 
@@ -25,32 +26,31 @@ Update this file after every meaningful implementation change.
 - **PHASE 1 COMPLETE (Units 08–14 — Roadmap Engine)**: Internal Schema, Adapter, Ingestion, Read API, Roadmap UI Shell, Skill State Engine, Skill Detail UI.
 - **PHASE 2 COMPLETE (Units 15–22 — Assessment Engine)**: Question Schema, Test/Attempt Schema, Question Selection Service, Assessment API, Timed Assessment UI, Scoring & Verification Engine, Attempt Limit Enforcement, Unlock Progression Engine.
 - **PHASE 3 COMPLETE (Units 23–27 — Verification Portfolio)**: Verification Artifact Model, Portfolio Persistence & Compilation, Public Profile API, Shareable Portfolio UI, Proof Card Generator.
-- **Unit 28 — Job Posting Schema & Extractor Model**:
-  - Spec `28-job-posting-schema.md`.
-  - Implemented `JobPostingDTO`, `JobSkillRequirementDTO`, `CreateJobPostingInput`, and `ExtractedSkillsResult` in `backend/src/career/types.ts`.
-  - Implemented `JobExtractorService` in `backend/src/career/jobExtractorService.ts`.
-  - Implemented `JobPostingService` in `backend/src/career/jobPostingService.ts`.
-- **Unit 29 — Deterministic Match Engine**:
-  - Spec `29-deterministic-match-engine.md`.
-  - Implemented `MatchedSkillItem`, `JobMatchAnalysisDTO`, `SkillMatchStatus`, and `ReadinessTier` in `backend/src/career/types.ts`.
-  - Implemented `JobMatchEngine` in `backend/src/career/jobMatchEngine.ts`.
-- **Unit 30 — Gap Analysis Engine**:
-  - Spec `30-gap-analysis-engine.md`.
-  - Implemented `PrerequisiteStepDTO`, `SkillGapRecommendationDTO`, `CareerGapAnalysisDTO`, and `GapPriority` in `backend/src/career/types.ts`.
-  - Implemented `JobGapEngine` in `backend/src/career/jobGapEngine.ts`.
-- **Unit 31 — Job Analyzer API**:
-  - Spec `31-job-analyzer-api.md`.
-  - Implemented `careerRouter` in `backend/src/career/routes.ts` (`GET /api/career/jobs`, `GET /api/career/jobs/:jobId`, `POST /api/career/jobs`, `POST /api/career/parse`, `POST /api/career/match/:jobId`, `POST /api/career/match-text`), mounted at `/api/career` in `backend/src/index.ts`.
-  - Implemented client `frontend/src/lib/careerApi.ts` (`fetchJobPostings`, `fetchJobPostingById`, `createJobPosting`, `parseJobText`, `analyzeJobMatch`, `analyzeJobMatchText`).
+- **PHASE 4 COMPLETE (Units 28–32 — Job Analyzer Engine)**: Job Posting Schema & Extractor, Deterministic Match Engine, Gap Analysis Engine, Job Analyzer API, Job Match & Gap UI.
+- **PHASE 5 COMPLETE (Units 33–38 — Interview Prep Engine)**:
+  - **Unit 33 — Mock Interview Question Bank & Schema**: `InterviewQuestionDTO`, `InterviewRubricCriteria`, `InterviewQuestionType`, and `InterviewQuestionBankService`.
+  - **Unit 34 — Interview Session Engine**: `InterviewSessionDTO`, `InterviewSessionQuestionDTO`, and `InterviewSessionService` managing staged question sequencing, pointer progression, and session states.
+  - **Unit 35 — AI Response Evaluator**: `InterviewEvaluatorService` performing rubric-based scoring, anti-pattern checks, and performance tier classification.
+  - **Unit 36 — STAR Method Feedback Formatter**: `StarFeedbackFormatterService` diagnosing Situation, Task, Action, Result completeness and structuring narrative reformulations.
+  - **Unit 37 — Interview Prep API**: `interviewRouter` mounted at `/api/interview` and client library `interviewApi.ts`.
+  - **Unit 38 — Mock Interview UI**: `MockInterviewView.tsx` with role track selection, simulated voice recording timers, live question navigation, real-time rubric checks, and comprehensive STAR performance reports.
 
 ## In Progress
 
-- Unit 32 — Job Match & Gap UI.
+- Unit 39 — Canvas & Node Render Model.
 
 ## Next Up
 
-1. **Unit 32 — Job Match & Gap UI**: Interactive split-screen job analyzer and career readiness dashboard finalizing Phase 4.
-2. **Phase 5 — Interview Prep Engine**: Question bank, session engine, AI evaluator, and readiness score (Units 33–38).
+1. **Unit 39 — Canvas & Node Render Model**: Interactive skill graph canvas, pan/zoom engine, and deterministic layout.
+2. **Unit 40 — Dependency Traversal Engine**: Prerequisite highlighting, unlock simulation, and pathfinding.
+3. **Unit 41 — Skill Profile Overlay**: Real-time candidate mastery overlay onto the visual skill graph.
+
+
+
+
+
+
+
 
 
 
