@@ -1,2 +1,4 @@
-// Ranking module boundary placeholder (Phase 7)
-export const RANKING_MODULE_VERSION = '0.1.0';
+export * from './types.js';
+export * from './scoreEngine.js';
+export * from './rankingService.js';
+export * from './routes.js';

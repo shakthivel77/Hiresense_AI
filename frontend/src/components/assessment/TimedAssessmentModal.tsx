@@ -9,6 +9,7 @@ import {
 } from '../../lib/assessmentApi';
 import { useAuth } from '../../context/AuthContext';
 import { AssessmentResultView } from './AssessmentResultView';
+import { useAssessmentIntegrity } from './useAssessmentIntegrity';
 import {
   X,
   Clock,
@@ -18,6 +19,11 @@ import {
   Loader2,
   AlertCircle,
   HelpCircle,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 
 interface TimedAssessmentModalProps {
@@ -47,6 +53,18 @@ export const TimedAssessmentModal: React.FC<TimedAssessmentModalProps> = ({
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(15 * 60);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isTestActive = isOpen && !!attempt && !result && !loading && !error;
+  const {
+    integrityReport,
+    warningMessage,
+    dismissWarning,
+    toggleFullscreen,
+    isFullscreen,
+  } = useAssessmentIntegrity({
+    isActive: isTestActive,
+    currentQuestionIndex: currentQIndex,
+  });
 
   // Initialize test on open
   useEffect(() => {
@@ -142,7 +160,12 @@ export const TimedAssessmentModal: React.FC<TimedAssessmentModalProps> = ({
         selectedOptionIndex: selectedAnswers[q.id] !== undefined ? selectedAnswers[q.id] : -1,
       }));
 
-      const evalResult = await submitAssessment(attempt.id, formattedAnswers, token);
+      const evalResult = await submitAssessment(
+        attempt.id,
+        formattedAnswers,
+        token,
+        integrityReport
+      );
       setResult(evalResult);
     } catch (err: any) {
       setError(err.message || 'Failed to submit assessment');
@@ -159,7 +182,12 @@ export const TimedAssessmentModal: React.FC<TimedAssessmentModalProps> = ({
         questionId: q.id,
         selectedOptionIndex: selectedAnswers[q.id] !== undefined ? selectedAnswers[q.id] : -1,
       }));
-      const evalResult = await submitAssessment(attempt.id, formattedAnswers, token);
+      const evalResult = await submitAssessment(
+        attempt.id,
+        formattedAnswers,
+        token,
+        integrityReport
+      );
       setResult(evalResult);
     } catch (err: any) {
       setError(err.message || 'Time expired; submission failed.');
@@ -197,14 +225,52 @@ export const TimedAssessmentModal: React.FC<TimedAssessmentModalProps> = ({
             </div>
             <div>
               <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-muted">
-                Timed Assessment
+                Proctored Assessment
               </span>
               <h3 className="text-base font-bold text-primary">{skillName}</h3>
             </div>
           </div>
 
           {!result && attempt && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {/* Integrity HUD Badge */}
+              <div
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-mono text-xs font-semibold ${
+                  integrityReport.flaggedForReview
+                    ? 'bg-state-error/15 border-state-error/40 text-state-error'
+                    : integrityReport.integrityScore < 85
+                    ? 'bg-state-warning/15 border-state-warning/40 text-state-warning'
+                    : 'bg-state-success/15 border-state-success/40 text-state-success'
+                }`}
+                title={`Integrity Score: ${integrityReport.integrityScore}%, Tab switches: ${integrityReport.tabSwitchesCount}`}
+              >
+                {integrityReport.flaggedForReview ? (
+                  <>
+                    <AlertTriangle className="h-3.5 w-3.5" />
+                    <span>Integrity Flagged ({integrityReport.integrityScore}%)</span>
+                  </>
+                ) : integrityReport.integrityScore < 85 ? (
+                  <>
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    <span>Integrity: {integrityReport.integrityScore}%</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span>Integrity: 100%</span>
+                  </>
+                )}
+              </div>
+
+              {/* Fullscreen Mode Toggler */}
+              <button
+                onClick={toggleFullscreen}
+                className="p-1.5 text-muted hover:text-primary rounded-lg bg-base border border-border hover:bg-elevated transition-colors"
+                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen Mode'}
+              >
+                {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </button>
+
               {/* Countdown Timer */}
               <div
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-mono text-xs font-bold ${
@@ -231,6 +297,22 @@ export const TimedAssessmentModal: React.FC<TimedAssessmentModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* Transient Violation Alert Banner */}
+        {warningMessage && !result && (
+          <div className="bg-state-warning/15 border-b border-state-warning/30 px-5 py-2.5 flex items-center justify-between text-xs text-state-warning animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-2 font-medium">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+              <span>{warningMessage}</span>
+            </div>
+            <button
+              onClick={dismissWarning}
+              className="text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-state-warning/20 hover:bg-state-warning/30 text-state-warning"
+            >
+              Acknowledge
+            </button>
+          </div>
+        )}
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto flex-1">

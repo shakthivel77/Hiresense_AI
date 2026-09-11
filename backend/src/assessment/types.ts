@@ -111,6 +111,35 @@ export interface QuestionEvaluationDetail {
   explanation?: string;
 }
 
+export type IntegrityEventType =
+  | 'TAB_SWITCH'
+  | 'FOCUS_LOST'
+  | 'FULLSCREEN_EXIT'
+  | 'CLIPBOARD_COPY'
+  | 'CLIPBOARD_PASTE'
+  | 'CONTEXT_MENU'
+  | 'RAPID_ANSWER';
+
+export interface IntegritySignalEvent {
+  id: string;
+  eventType: IntegrityEventType;
+  timestamp: string;
+  durationMs?: number;
+  questionIndex?: number;
+  details?: string;
+}
+
+export interface AssessmentIntegrityReport {
+  integrityScore: number; // 0 - 100
+  totalViolations: number;
+  tabSwitchesCount: number;
+  focusLossCount: number;
+  fullscreenExitCount: number;
+  clipboardActionsCount: number;
+  flaggedForReview: boolean;
+  events: IntegritySignalEvent[];
+}
+
 /**
  * Final Test Evaluation Result returned upon test submission
  */
@@ -125,6 +154,8 @@ export interface TestEvaluationResult {
   correctAnswersCount: number;
   completedAt: string;
   details: QuestionEvaluationDetail[];
+  integrityReport?: AssessmentIntegrityReport;
+  integrityWarning?: string;
   newlyUnlockedSkills?: Array<{
     id: string;
     name: string;
@@ -145,3 +176,4 @@ export function sanitizeQuestionForClient(q: QuestionDTO): PublicQuestionDTO {
     difficulty: q.difficulty,
   };
 }
+

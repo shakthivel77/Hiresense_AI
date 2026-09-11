@@ -5,6 +5,7 @@ import { RoadmapView } from './components/roadmap';
 import { PortfolioView } from './components/portfolio';
 import { JobAnalyzerView } from './components/career';
 import { MockInterviewView } from './components/interview';
+import { LeaderboardView } from './components/ranking';
 import { Terminal, Shield, Cpu, BookOpen, Award, Target, MessageSquare, BarChart3, LogIn, LogOut, UserCheck, ArrowRight } from 'lucide-react';
 
 type NavView = 'dashboard' | 'roadmap' | 'assessment' | 'career' | 'interview' | 'leaderboard';
@@ -161,6 +162,11 @@ function MainApp() {
                 setActiveView('roadmap');
               }}
             />
+          ) : activeView === 'leaderboard' ? (
+            <LeaderboardView
+              onNavigateToRoadmap={() => setActiveView('roadmap')}
+              onNavigateToInterview={() => setActiveView('interview')}
+            />
           ) : activeView === 'dashboard' ? (
             <div className="space-y-6">
               <div className="bg-surface rounded-xl p-6 border border-border">
@@ -175,25 +181,47 @@ function MainApp() {
                 </div>
               </div>
 
-              {/* Quick Action: Open Roadmap */}
-              <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-6 border border-accent-primary/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-primary px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
-                    Phase 1 Active Feature
-                  </span>
-                  <h3 className="text-lg font-bold text-primary mt-2">Explore Normalized Learning Roadmaps</h3>
-                  <p className="text-xs text-muted mt-1">
-                    Browse prerequisite-aware skill graphs across Backend Developer, Frontend Developer, and AI & Data Engineer tracks.
-                  </p>
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-accent-primary/30 flex flex-col justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-primary px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
+                      Skill Graph
+                    </span>
+                    <h3 className="text-base font-bold text-primary mt-2">Explore Learning Roadmaps</h3>
+                    <p className="text-xs text-muted mt-1">
+                      Browse prerequisite-aware DAG skill graphs across Backend, Frontend, and AI tracks.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveView('roadmap')}
+                    className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-base font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span>Open Roadmap</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setActiveView('roadmap')}
-                  className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-base font-semibold text-xs px-4 py-2 rounded-lg transition-colors whitespace-nowrap self-start sm:self-auto"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span>Open Roadmap</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
+
+                <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-purple-500/30 flex flex-col justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
+                      Phase 7 Active Feature
+                    </span>
+                    <h3 className="text-base font-bold text-primary mt-2">Competency Leaderboard</h3>
+                    <p className="text-xs text-muted mt-1">
+                      Inspect your 5-component competency score and compare across global and university rankings.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveView('leaderboard')}
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span>View Leaderboard</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

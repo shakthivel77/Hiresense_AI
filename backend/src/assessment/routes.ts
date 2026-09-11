@@ -1,9 +1,10 @@
-import { Router, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { requireAuth } from '../auth/middleware.js';
 import { AuthenticatedRequest } from '../auth/types.js';
 import { testService } from './testService.js';
 import { questionSelectionService } from './questionSelectionService.js';
 import { questionBankService } from './questionBankService.js';
+import { domainDiagnosticService } from './diagnosticService.js';
 import { sanitizeQuestionForClient, QuestionDTO } from './types.js';
 
 const router = Router();
@@ -176,7 +177,7 @@ router.post('/submit', requireAuth, async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    const { attemptId, answers } = req.body;
+    const { attemptId, answers, integrityReport } = req.body;
     if (!attemptId || !Array.isArray(answers)) {
       res.status(400).json({
         success: false,
@@ -185,7 +186,7 @@ router.post('/submit', requireAuth, async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    const evaluationResult = await testService.submitAttempt(attemptId, userId, answers);
+    const evaluationResult = await testService.submitAttempt(attemptId, userId, answers, integrityReport);
 
     res.status(200).json({
       success: true,
@@ -304,5 +305,94 @@ router.get('/attempts-status/:skillId', requireAuth, async (req: AuthenticatedRe
   }
 });
 
+/**
+ * POST /api/assessment/diagnostic/generate
+ * Generates a targeted multi-skill domain diagnostic assessment
+ */
+router.post('/diagnostic/generate', async (req: Request, res: Response) => {
+  try {
+    const { domainSlug, userId, targetSkillIds } = req.body;
+    const diagnostic = await domainDiagnosticService.generateDomainDiagnostic({
+      domainSlug: domainSlug || 'backend-developer',
+      userId,
+      targetSkillIds,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: diagnostic,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'DIAGNOSTIC_GENERATION_FAILED', message: err.message || 'Failed to generate diagnostic' },
+    });
+  }
+});
+
+/**
+ * GET /api/assessment/diagnostic/:diagnosticId
+ * Fetches active public domain diagnostic questions
+ */
+router.get('/diagnostic/:diagnosticId', (req: Request, res: Response) => {
+  try {
+    const { diagnosticId } = req.params;
+    const diagnostic = domainDiagnosticService.getDiagnostic(diagnosticId);
+
+    if (!diagnostic) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'DIAGNOSTIC_NOT_FOUND', message: `Diagnostic '${diagnosticId}' not found or expired` },
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: diagnostic,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'DIAGNOSTIC_FETCH_FAILED', message: err.message || 'Failed to fetch diagnostic' },
+    });
+  }
+});
+
+/**
+ * POST /api/assessment/diagnostic/submit
+ * Submits diagnostic answers, evaluating each skill independently with >= 80% passing threshold
+ */
+router.post('/diagnostic/submit', async (req: Request, res: Response) => {
+  try {
+    const { diagnosticId, userId, answers } = req.body;
+
+    if (!diagnosticId || !Array.isArray(answers)) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_PAYLOAD', message: 'diagnosticId and answers array are required' },
+      });
+      return;
+    }
+
+    const evaluation = await domainDiagnosticService.evaluateDiagnostic({
+      diagnosticId,
+      userId: userId || 'candidate-user',
+      answers,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: evaluation,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'DIAGNOSTIC_EVALUATION_FAILED', message: err.message || 'Failed to evaluate diagnostic' },
+    });
+  }
+});
+
 export default router;
 export { router as assessmentRouter };
+

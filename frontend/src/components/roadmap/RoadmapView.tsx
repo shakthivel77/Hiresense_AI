@@ -6,7 +6,22 @@ import { DomainSelector } from './DomainSelector';
 import { SkillNodeCard } from './SkillNodeCard';
 import { SkillDetailModal } from './SkillDetailModal';
 import { TimedAssessmentModal } from '../assessment/TimedAssessmentModal';
-import { GitBranch, Filter, Layers, AlertCircle, RefreshCw, CheckCircle2, Lock, PlayCircle } from 'lucide-react';
+import {
+  LayoutEngine,
+  SkillGraphCanvas,
+  VisualizerControls,
+  VisualizerNode,
+} from '../visualizer';
+import {
+  GitBranch,
+  Layers,
+  AlertCircle,
+  RefreshCw,
+  CheckCircle2,
+  Lock,
+  PlayCircle,
+  Network,
+} from 'lucide-react';
 
 interface RoadmapViewProps {
   initialDomainSlug?: string;
@@ -25,9 +40,15 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   const [loadingGraph, setLoadingGraph] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filter states
+  // View mode switcher: 'graph' (interactive visual DAG canvas) | 'tier' (structured stage list)
+  const [viewMode, setViewMode] = useState<'graph' | 'tier'>('graph');
+
+  // Filter & Search states
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [layoutDirection, setLayoutDirection] = useState<'LR' | 'TB'>('LR');
+  const [showMiniMap, setShowMiniMap] = useState<boolean>(true);
 
   // Selected skill modal state
   const [selectedNode, setSelectedNode] = useState<SkillGraphNode | null>(null);
@@ -102,11 +123,42 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
     return Array.from(catSet);
   }, [graphData]);
 
+  // Filtered raw nodes
+  const filteredGraphNodes = useMemo(() => {
+    if (!graphData) return [];
+    return graphData.nodes.filter((node) => {
+      const matchSearch =
+        !searchQuery ||
+        node.skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        node.skill.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        node.skill.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchCategory =
+        selectedCategory === 'all' || node.skill.category === selectedCategory;
+
+      const matchDifficulty =
+        selectedDifficulty === 'all' || node.skill.difficulty === selectedDifficulty;
+
+      return matchSearch && matchCategory && matchDifficulty;
+    });
+  }, [graphData, searchQuery, selectedCategory, selectedDifficulty]);
+
+  // Layout calculations for Visualizer Canvas
+  const visualizerData = useMemo(() => {
+    if (!graphData) {
+      return { nodes: [], edges: [], bounds: { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 } };
+    }
+    // Compute layout on all nodes or filtered subset
+    return LayoutEngine.computeLayout(filteredGraphNodes, {
+      direction: layoutDirection,
+    });
+  }, [graphData, filteredGraphNodes, layoutDirection]);
+
   // Calculate topological stages/levels for visual progression
   const stageGroups = useMemo(() => {
     if (!graphData) return [];
 
-    const nodes = graphData.nodes;
+    const nodes = filteredGraphNodes;
     const depthMap = new Map<string, number>();
 
     // Compute depth recursively
@@ -115,7 +167,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
       if (visited.has(skillId)) return 0; // Prevent cycle
 
       visited.add(skillId);
-      const node = nodes.find((n) => n.skill.id === skillId);
+      const node = graphData.nodes.find((n) => n.skill.id === skillId);
       if (!node || node.prerequisiteSkillIds.length === 0) {
         depthMap.set(skillId, 0);
         return 0;
@@ -155,10 +207,10 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
     }
 
     return stages;
-  }, [graphData]);
+  }, [graphData, filteredGraphNodes]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header Banner */}
       <div className="bg-surface rounded-2xl p-6 border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -246,6 +298,43 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
         loading={loadingDomains}
       />
 
+      {/* View Mode Toggle & Overview Bar */}
+      {graphData && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-3 rounded-2xl border border-border">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted font-medium">View Mode:</span>
+            <div className="flex items-center bg-elevated rounded-xl p-1 border border-border/80">
+              <button
+                onClick={() => setViewMode('graph')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  viewMode === 'graph'
+                    ? 'bg-accent-primary text-base shadow-sm'
+                    : 'text-muted hover:text-primary'
+                }`}
+              >
+                <Network className="h-3.5 w-3.5" />
+                <span>Visual Graph</span>
+              </button>
+              <button
+                onClick={() => setViewMode('tier')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  viewMode === 'tier'
+                    ? 'bg-accent-primary text-base shadow-sm'
+                    : 'text-muted hover:text-primary'
+                }`}
+              >
+                <Layers className="h-3.5 w-3.5" />
+                <span>Tier Stages</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="text-xs font-mono text-muted text-right">
+            <span>{graphData.roadmap.title} (v{graphData.roadmap.version})</span>
+          </div>
+        </div>
+      )}
+
       {/* Error state */}
       {error && (
         <div className="p-4 rounded-xl bg-state-error/10 border border-state-error/30 text-state-error flex items-center justify-between text-xs">
@@ -262,95 +351,93 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
         </div>
       )}
 
-      {/* Roadmap Graph Content */}
+      {/* Roadmap Content */}
       {loadingGraph ? (
         <div className="p-12 text-center bg-surface rounded-2xl border border-border space-y-3">
           <RefreshCw className="h-6 w-6 text-accent-primary animate-spin mx-auto" />
           <p className="text-xs text-muted font-mono">Loading domain roadmap graph...</p>
         </div>
       ) : graphData ? (
-        <div className="space-y-6">
-          {/* Roadmap Meta & Filters Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-surface border border-border">
-            <div>
-              <h3 className="font-semibold text-primary text-sm">{graphData.roadmap.title}</h3>
-              <p className="text-xs text-muted mt-0.5">Version {graphData.roadmap.version}</p>
-            </div>
+        <div className="space-y-4">
+          {/* Visualizer Controls */}
+          <VisualizerControls
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={setSelectedDifficulty}
+            direction={layoutDirection}
+            onDirectionToggle={() =>
+              setLayoutDirection((prev) => (prev === 'LR' ? 'TB' : 'LR'))
+            }
+            showMiniMap={showMiniMap}
+            onMiniMapToggle={() => setShowMiniMap((prev) => !prev)}
+            onResetView={() => {
+              setSearchQuery('');
+              setSelectedCategory('all');
+              setSelectedDifficulty('all');
+            }}
+          />
 
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Category Filter */}
-              <div className="flex items-center gap-1.5 text-xs text-muted">
-                <Filter className="h-3.5 w-3.5" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="bg-base border border-border text-primary rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent-primary"
-                >
-                  <option value="all">All Categories ({categories.length})</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          {viewMode === 'graph' ? (
+            /* Interactive Visual DAG Canvas */
+            <SkillGraphCanvas
+              nodes={visualizerData.nodes}
+              edges={visualizerData.edges}
+              bounds={visualizerData.bounds}
+              selectedNodeId={selectedNode?.skill.id}
+              showMiniMap={showMiniMap}
+              onSelectNode={(node: VisualizerNode) => {
+                if (!node.id) {
+                  setSelectedNode(null);
+                  return;
+                }
+                const fullNode = graphData.nodes.find((n) => n.skill.id === node.id) || null;
+                setSelectedNode(fullNode);
+              }}
+              onNodeDoubleClick={(node: VisualizerNode) => {
+                const fullNode = graphData.nodes.find((n) => n.skill.id === node.id) || null;
+                if (fullNode) setSelectedNode(fullNode);
+              }}
+              onLaunchAssessment={(skillId, skillName) => {
+                setActiveAssessmentSkill({ id: skillId, name: skillName });
+              }}
+            />
+          ) : (
+            /* Structured Stage List View */
+            <div className="space-y-6 pt-2">
+              {stageGroups.map((stage) => {
+                if (stage.nodes.length === 0) return null;
 
-              {/* Difficulty Filter */}
-              <div className="flex items-center gap-1.5 text-xs text-muted">
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="bg-base border border-border text-primary rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent-primary capitalize"
-                >
-                  <option value="all">All Difficulties</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-            </div>
-          </div>
+                return (
+                  <div key={stage.level} className="space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                      <div className="h-2 w-2 rounded-full bg-accent-primary" />
+                      <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted">
+                        {stage.title}
+                      </h4>
+                      <span className="text-[10px] font-mono text-muted bg-base px-2 py-0.5 rounded border border-border ml-auto">
+                        {stage.nodes.length} {stage.nodes.length === 1 ? 'Skill' : 'Skills'}
+                      </span>
+                    </div>
 
-          {/* Graph Stages */}
-          <div className="space-y-8">
-            {stageGroups.map((stage) => {
-              // Apply local filters
-              const filteredNodes = stage.nodes.filter((node) => {
-                const matchCategory =
-                  selectedCategory === 'all' || node.skill.category === selectedCategory;
-                const matchDifficulty =
-                  selectedDifficulty === 'all' || node.skill.difficulty === selectedDifficulty;
-                return matchCategory && matchDifficulty;
-              });
-
-              if (filteredNodes.length === 0) return null;
-
-              return (
-                <div key={stage.level} className="space-y-3">
-                  <div className="flex items-center gap-2 pb-2 border-b border-border/70">
-                    <div className="h-2 w-2 rounded-full bg-accent-primary" />
-                    <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted">
-                      {stage.title}
-                    </h4>
-                    <span className="text-[10px] font-mono text-muted bg-base px-2 py-0.5 rounded border border-border ml-auto">
-                      {filteredNodes.length} {filteredNodes.length === 1 ? 'Skill' : 'Skills'}
-                    </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {stage.nodes.map((node) => (
+                        <SkillNodeCard
+                          key={node.skill.id}
+                          node={node}
+                          allNodes={graphData.nodes}
+                          onSelect={(selected) => setSelectedNode(selected)}
+                        />
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredNodes.map((node) => (
-                      <SkillNodeCard
-                        key={node.skill.id}
-                        node={node}
-                        allNodes={graphData.nodes}
-                        onSelect={(selected) => setSelectedNode(selected)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : (
         <div className="p-12 text-center bg-surface rounded-2xl border border-border">

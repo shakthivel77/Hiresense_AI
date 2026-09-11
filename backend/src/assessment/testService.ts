@@ -5,6 +5,7 @@ import {
   TestEvaluationResult,
   UserAnswerSubmission,
   QuestionEvaluationDetail,
+  AssessmentIntegrityReport,
 } from './types.js';
 import { questionBankService } from './questionBankService.js';
 import { skillService } from '../skills/service.js';
@@ -132,7 +133,8 @@ export class TestService {
   public async submitAttempt(
     attemptId: string,
     userId: string,
-    answers: UserAnswerSubmission[]
+    answers: UserAnswerSubmission[],
+    integrityReport?: AssessmentIntegrityReport
   ): Promise<TestEvaluationResult> {
     const attempt = this.attemptsMap.get(attemptId);
     if (!attempt) {
@@ -190,20 +192,42 @@ export class TestService {
     }
 
     const totalQuestions = attempt.questionIds.length;
-    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100 * 100) / 100 : 0;
-    const passed = score >= test.passingScore;
+    const rawScore = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100 * 100) / 100 : 0;
+    let passed = rawScore >= test.passingScore;
+    let integrityWarning: string | undefined = undefined;
+
+    // Evaluate integrity signals
+    if (integrityReport) {
+      const tabSwitches = integrityReport.tabSwitchesCount || 0;
+      const focusLosses = integrityReport.focusLossCount || 0;
+      const fullscreenExits = integrityReport.fullscreenExitCount || 0;
+      const clipboardActions = integrityReport.clipboardActionsCount || 0;
+
+      const penalties = tabSwitches * 15 + focusLosses * 15 + fullscreenExits * 20 + clipboardActions * 10;
+      const computedIntegrityScore = Math.max(0, Math.min(100, 100 - penalties));
+      integrityReport.integrityScore = computedIntegrityScore;
+
+      if (tabSwitches > 3 || computedIntegrityScore < 60) {
+        integrityReport.flaggedForReview = true;
+        passed = false; // Disqualifies verification
+        integrityWarning =
+          'Integrity violation detected: excessive tab switching or window focus loss recorded during assessment. Attempt has been flagged for review and skill verification is disqualified.';
+      }
+    }
 
     // Update attempt record
     const completedAt = now.toISOString();
     attempt.answers = answers;
-    attempt.score = score;
+    attempt.score = rawScore;
     attempt.passed = passed;
     attempt.status = 'COMPLETED';
     attempt.completedAt = completedAt;
     this.attemptsMap.set(attempt.id, attempt);
 
-    // Synchronize deterministic verification result with Skill Engine
-    await skillService.recordVerificationResult(userId, attempt.skillId, score);
+    // Synchronize deterministic verification result with Skill Engine if passed
+    if (passed) {
+      await skillService.recordVerificationResult(userId, attempt.skillId, rawScore);
+    }
 
     // Calculate newly unlocked downstream competencies & generate cryptographic proof
     let newlyUnlockedSkills: Array<{ id: string; name: string; category: string }> = [];
@@ -216,7 +240,7 @@ export class TestService {
         const proof = await proofService.createProofArtifact({
           userId,
           skillId: attempt.skillId,
-          score,
+          score: rawScore,
           attemptId: attempt.id,
           verificationDate: completedAt,
         });
@@ -247,13 +271,15 @@ export class TestService {
       attemptId: attempt.id,
       testId: test.id,
       skillId: attempt.skillId,
-      score,
+      score: rawScore,
       passed,
       passingScore: test.passingScore,
       totalQuestions,
       correctAnswersCount: correctCount,
       completedAt,
       details,
+      integrityReport,
+      integrityWarning,
       newlyUnlockedSkills,
       proofId,
       proofUrl,

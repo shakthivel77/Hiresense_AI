@@ -54,7 +54,7 @@ export const AssessmentResultView: React.FC<AssessmentResultViewProps> = ({
         </div>
 
         {/* Score Numbers Grid */}
-        <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2 font-mono text-xs">
+        <div className="grid grid-cols-4 gap-3 max-w-lg mx-auto pt-2 font-mono text-xs">
           <div className="p-3 bg-base/80 rounded-xl border border-border">
             <span
               className={`text-xl font-bold block ${
@@ -77,8 +77,36 @@ export const AssessmentResultView: React.FC<AssessmentResultViewProps> = ({
             <span className="text-xl font-bold text-accent-primary block">80%</span>
             <span className="text-[10px] text-muted uppercase">Required</span>
           </div>
+
+          <div className="p-3 bg-base/80 rounded-xl border border-border">
+            <span
+              className={`text-xl font-bold block ${
+                !result.integrityReport || result.integrityReport.integrityScore >= 80
+                  ? 'text-state-success'
+                  : result.integrityReport.integrityScore >= 60
+                  ? 'text-state-warning'
+                  : 'text-state-error'
+              }`}
+            >
+              {result.integrityReport ? `${result.integrityReport.integrityScore}%` : '100%'}
+            </span>
+            <span className="text-[10px] text-muted uppercase">Integrity</span>
+          </div>
         </div>
       </div>
+
+      {/* Integrity Violation Alert if present */}
+      {result.integrityWarning && (
+        <div className="p-4 rounded-xl bg-state-error/10 border border-state-error/30 flex items-start gap-3 text-xs">
+          <ShieldAlert className="h-5 w-5 text-state-error flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold text-state-error uppercase tracking-wider block">
+              Integrity Proctoring Notice
+            </span>
+            <p className="text-muted mt-0.5">{result.integrityWarning}</p>
+          </div>
+        </div>
+      )}
 
       {/* Newly Unlocked Competencies Banner */}
       {isPassed && result.newlyUnlockedSkills && result.newlyUnlockedSkills.length > 0 && (

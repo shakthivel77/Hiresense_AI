@@ -42,6 +42,35 @@ export interface QuestionEvaluationDetail {
   explanation?: string;
 }
 
+export type IntegrityEventType =
+  | 'TAB_SWITCH'
+  | 'FOCUS_LOST'
+  | 'FULLSCREEN_EXIT'
+  | 'CLIPBOARD_COPY'
+  | 'CLIPBOARD_PASTE'
+  | 'CONTEXT_MENU'
+  | 'RAPID_ANSWER';
+
+export interface IntegritySignalEvent {
+  id: string;
+  eventType: IntegrityEventType;
+  timestamp: string;
+  durationMs?: number;
+  questionIndex?: number;
+  details?: string;
+}
+
+export interface AssessmentIntegrityReport {
+  integrityScore: number;
+  totalViolations: number;
+  tabSwitchesCount: number;
+  focusLossCount: number;
+  fullscreenExitCount: number;
+  clipboardActionsCount: number;
+  flaggedForReview: boolean;
+  events: IntegritySignalEvent[];
+}
+
 export interface TestEvaluationResult {
   attemptId: string;
   testId: string;
@@ -53,6 +82,8 @@ export interface TestEvaluationResult {
   correctAnswersCount: number;
   completedAt: string;
   details: QuestionEvaluationDetail[];
+  integrityReport?: AssessmentIntegrityReport;
+  integrityWarning?: string;
   newlyUnlockedSkills?: Array<{
     id: string;
     name: string;
@@ -96,7 +127,8 @@ export async function startAssessment(
 export async function submitAssessment(
   attemptId: string,
   answers: UserAnswerSubmission[],
-  token: string
+  token: string,
+  integrityReport?: AssessmentIntegrityReport
 ): Promise<TestEvaluationResult> {
   const res = await fetch('/api/assessment/submit', {
     method: 'POST',
@@ -104,7 +136,7 @@ export async function submitAssessment(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ attemptId, answers }),
+    body: JSON.stringify({ attemptId, answers, integrityReport }),
   });
 
   const json: SubmitAssessmentResponse = await res.json();
