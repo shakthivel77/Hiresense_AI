@@ -167,23 +167,46 @@ export async function extractResumeSkills(
 
 /**
  * Persist extracted unverified skill claims into candidate profile.
+ * Supports:
+ * - importSkillClaims(claims, token)
+ * - importSkillClaims(userId, claims, token)
  */
 export async function importSkillClaims(
-  userId: string,
-  claims: ExtractedSkillClaim[],
+  claimsOrUserId: ExtractedSkillClaim[] | string,
+  claimsOrToken?: ExtractedSkillClaim[] | string | null,
   token?: string | null
-): Promise<{ success: boolean; data: { importedCount: number; claims: ExtractedSkillClaim[] } }> {
+): Promise<{ success: boolean; data: { userId: string; importedCount: number; claims: ExtractedSkillClaim[] } }> {
+  let effectiveClaims: ExtractedSkillClaim[] = [];
+  let effectiveToken: string | null | undefined = null;
+  let clientUserId: string | undefined = undefined;
+
+  if (Array.isArray(claimsOrUserId)) {
+    effectiveClaims = claimsOrUserId;
+    effectiveToken = claimsOrToken as string | null | undefined;
+  } else {
+    clientUserId = claimsOrUserId;
+    effectiveClaims = (claimsOrToken as ExtractedSkillClaim[]) || [];
+    effectiveToken = token;
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (effectiveToken) {
+    headers['Authorization'] = `Bearer ${effectiveToken}`;
+  }
+
+  const payload: { claims: ExtractedSkillClaim[]; userId?: string } = {
+    claims: effectiveClaims,
+  };
+  if (clientUserId) {
+    payload.userId = clientUserId;
   }
 
   const res = await fetch('/api/resume/import-claims', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ userId, claims }),
+    body: JSON.stringify(payload),
   });
 
   const data = await res.json();

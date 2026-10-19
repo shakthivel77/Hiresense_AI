@@ -217,6 +217,22 @@ export class ResumeSkillExtractor {
   }
 
   /**
+   * Helper: Check whether a skillId exists in the canonical taxonomy.
+   */
+  public static hasSkillId(skillId: string): boolean {
+    if (!skillId || typeof skillId !== 'string') return false;
+    return this.TAXONOMY.some((s) => s.skillId.toLowerCase() === skillId.trim().toLowerCase());
+  }
+
+  /**
+   * Helper: Retrieve taxonomy definition for a given skillId.
+   */
+  public static getSkillById(skillId: string): TaxonomySkillDefinition | undefined {
+    if (!skillId || typeof skillId !== 'string') return undefined;
+    return this.TAXONOMY.find((s) => s.skillId.toLowerCase() === skillId.trim().toLowerCase());
+  }
+
+  /**
    * Convenience method: runs text extraction and skill extraction end-to-end from raw text.
    */
   public static extractSkillsFromRawText(

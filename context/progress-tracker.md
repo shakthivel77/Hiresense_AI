@@ -64,14 +64,21 @@ Update this file after every meaningful implementation change.
     - Segments resume text into structured sections: `contact`, `summary`, `experience`, `education`, `rawSkillsText`, `projects`, and `certifications`.
     - Mounted `/api/resume` in `backend/src/index.ts`.
     - Exported frontend API client in `frontend/src/lib/resumeApi.ts`.
+    - Created user-facing `ResumeView.tsx` in `frontend/src/components/resume/` supporting PDF upload, plain-text paste, and structured section visualization.
     - Guaranteed core invariant: all extracted items are stamped as `UNVERIFIED` claims.
-  - **Unit 47 — Resume Skill Extraction**:
+  - **Unit 47 — Resume Skill Extraction & Ingestion UI**:
     - Spec `47-resume-skill-extraction.md`.
     - Implemented `ResumeSkillExtractor` in `backend/src/resume/skillExtractor.ts` and router in `backend/src/resume/routes.ts`.
     - Multi-pass taxonomy keyword & alias match engine matching canonical track skills across `backend-developer`, `frontend-developer`, `ai-data-engineer`.
     - Scans explicit skill tokens, work experience bullet points, and project tech stacks.
     - Stamped all extracted skills strictly as `UNVERIFIED` self-claims (`status: 'UNVERIFIED'`, `verificationScore: null`).
     - Provided `/api/resume/extract-skills` and `/api/resume/import-claims` REST endpoints.
+    - Secured `POST /api/resume/import-claims` with `requireAuth` middleware, server-side `req.user.id` identity derivation, cross-user mismatch rejection (HTTP 403), and payload/skill ID validation.
+    - Persisted validated claims via `skillService.claimSkill(authUserId, skillId, 'UNVERIFIED')` into skill store and Supabase `user_skills` table, queryable via `/api/skills/my-skills` and profile views.
+    - Enforced strict invariants: claims remain `UNVERIFIED` with null verification score and 0 contribution to competency scores or ranking.
+    - Implemented interactive candidate review & claim selection in `frontend/src/components/resume/ResumeView.tsx`.
+    - Integrated with `frontend/src/App.tsx` sidebar navigation (`Resume Ingestion` with `FileText` icon) and dashboard quick actions.
+    - Authored and verified comprehensive regression test suite in `backend/src/resume/resumeSecurityPersistence.test.ts` (9/9 scenarios passed) and live E2E server suite in `backend/src/resume/e2eLiveServerVerification.test.ts`.
   - **Unit 48 — Domain Diagnostic**:
     - Spec `48-domain-diagnostic.md`.
     - Implemented `DomainDiagnosticService` in `backend/src/assessment/diagnosticService.ts` and types in `backend/src/assessment/diagnosticTypes.ts`.

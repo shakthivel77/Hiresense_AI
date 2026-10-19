@@ -27,5 +27,8 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
 ECC/
+
+# Graphify cache & backups
+graphify-out/cache/
+graphify-out/202*/

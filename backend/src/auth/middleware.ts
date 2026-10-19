@@ -25,7 +25,7 @@ export async function requireAuth(
 
     if (!isSupabaseConfigured()) {
       // Development mock bypass mode when Supabase is not configured
-      if (process.env.NODE_ENV === 'development' && token === 'mock-dev-token') {
+      if (process.env.NODE_ENV !== 'production' && token === 'mock-dev-token') {
         req.user = {
           id: '00000000-0000-0000-0000-000000000001',
           email: 'dev-user@hiresense.ai',

@@ -1,0 +1,467 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "projectMeta": {
+    "name": "Hiresense_AI",
+    "version": "0.1.0",
+    "type": "University Final-Year Academic Project",
+    "teamSize": 3,
+    "budget": "$0.00 (Zero budget)",
+    "architectureStyle": "Modular Monolith",
+    "backendStack": "Node.js (v20+), Express 4.19, TypeScript 5.4, tsx",
+    "frontendStack": "React 18.3, Vite 5.2, TypeScript 5.4, Tailwind CSS 3.4, Lucide React",
+    "databaseStack": "PostgreSQL via Supabase, with dual-mode in-memory fallback",
+    "authStack": "Supabase Auth (JWT Bearer) with local development mock bypass",
+    "lastAuditedDate": "2026-09-12T06:16:30+05:30",
+    "headCommit": "0bfaae0",
+    "headCommitMessage": "feat: complete Units 39-49 (DAG Visualizer, Ranking Engine, Resume Extraction, Domain Diagnostic & Assessment Integrity Signals)",
+    "lastActiveAuthor": "lakshmi <1hk23ai022@hkbk.edu.in>"
+  },
+  "verificationStatus": {
+    "backendTypeCheck": "PASSED (0 errors)",
+    "frontendTypeCheck": "PASSED (0 errors)",
+    "automatedUnitTests": {
+      "totalSuites": 8,
+      "passedSuites": 8,
+      "failedSuites": 0,
+      "suites": [
+        "backend/src/ranking/rankingVerification.test.ts",
+        "backend/src/assessment/diagnosticVerification.test.ts",
+        "backend/src/assessment/integrityVerification.test.ts",
+        "backend/src/resume/resumeVerification.test.ts",
+        "backend/src/resume/skillExtractionVerification.test.ts",
+        "backend/src/resume/auditVerificationSuite.test.ts",
+        "backend/src/resume/resumeSecurityPersistence.test.ts",
+        "backend/src/resume/e2eLiveServerVerification.test.ts"
+      ]
+    },
+    "runtimeVerification": "Verified clean execution via npx tsx, npx tsc --noEmit, and frontend production build"
+  },
+  "phases": {
+    "phase0_foundation": {
+      "name": "Foundation & Auth",
+      "units": "01-07",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase1_roadmap": {
+      "name": "Roadmap & Skill Progression",
+      "units": "08-14",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase2_assessment": {
+      "name": "Assessment & Skill Verification",
+      "units": "15-22",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase3_portfolio": {
+      "name": "Verification Portfolio & Proofs",
+      "units": "23-27",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase4_career": {
+      "name": "Job Analyzer & Career Gap Engine",
+      "units": "28-32",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase5_interview": {
+      "name": "Interview Preparation Engine",
+      "units": "33-38",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase6_visualizer": {
+      "name": "Skill Graph Visualizer (DAG Canvas)",
+      "units": "39-42",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase7_ranking": {
+      "name": "Ranking & Leaderboard Engine",
+      "units": "43-45",
+      "status": "COMPLETE",
+      "completionPercentage": 100
+    },
+    "phase8_advanced_extensions": {
+      "name": "Advanced Extensions & Ingestion",
+      "units": "46-49 (Implemented) / 50-51 (Planned)",
+      "status": "PARTIALLY IMPLEMENTED",
+      "completionPercentage": 67
+    },
+    "phase9_freeze": {
+      "name": "Integration, Hardening & Freeze",
+      "units": "52-56",
+      "status": "PLANNED",
+      "completionPercentage": 0
+    }
+  },
+  "unitInventory": {
+    "Unit 01": {
+      "name": "Repository & App Skeleton",
+      "status": "COMPLETE",
+      "evidence": ["backend/package.json", "frontend/package.json", "backend/src/index.ts", "frontend/src/App.tsx"]
+    },
+    "Unit 02": {
+      "name": "Environment & Supabase Connection",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/common/supabase.ts", "backend/.env.example", "frontend/.env.example"]
+    },
+    "Unit 03": {
+      "name": "Database Baseline",
+      "status": "COMPLETE",
+      "evidence": ["database/migrations/001_initial_schema.sql", "database/seeds/001_initial_seeds.sql"]
+    },
+    "Unit 04": {
+      "name": "Authentication API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/auth/middleware.ts", "backend/src/auth/routes.ts"]
+    },
+    "Unit 05": {
+      "name": "Authentication UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/auth/AuthModal.tsx", "frontend/src/context/AuthContext.tsx"]
+    },
+    "Unit 06": {
+      "name": "Profile API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/users/service.ts", "backend/src/users/routes.ts"]
+    },
+    "Unit 07": {
+      "name": "Profile UI",
+      "status": "IMPLEMENTED BUT DISCONNECTED",
+      "evidence": ["frontend/src/components/profile/ProfileView.tsx"],
+      "notes": "Component created but not mounted in App.tsx navigation shell"
+    },
+    "Unit 08": {
+      "name": "Roadmap Internal Schema",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/roadmap/types.ts", "database/migrations/001_initial_schema.sql"]
+    },
+    "Unit 09": {
+      "name": "Roadmap Adapter",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/roadmap/adapter.ts"]
+    },
+    "Unit 10": {
+      "name": "Roadmap Import & Seeds",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/roadmap/service.ts (seedInitialRoadmaps)"]
+    },
+    "Unit 11": {
+      "name": "Roadmap Read API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/roadmap/routes.ts"]
+    },
+    "Unit 12": {
+      "name": "Roadmap UI Shell",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/roadmap/RoadmapView.tsx", "frontend/src/components/roadmap/DomainSelector.tsx"]
+    },
+    "Unit 13": {
+      "name": "Skill State Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/skills/service.ts (getUserRoadmapState)"]
+    },
+    "Unit 14": {
+      "name": "Skill Detail UI & Resource Links",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/roadmap/SkillDetailModal.tsx", "frontend/src/components/roadmap/SkillNodeCard.tsx", "backend/src/resources/service.ts"]
+    },
+    "Unit 15": {
+      "name": "Question Schema & Bank",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/questionBankService.ts", "backend/src/assessment/types.ts"]
+    },
+    "Unit 16": {
+      "name": "Test Attempt Schema",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/types.ts", "database/migrations/001_initial_schema.sql"]
+    },
+    "Unit 17": {
+      "name": "Question Selection Service",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/questionSelectionService.ts"]
+    },
+    "Unit 18": {
+      "name": "Assessment Lifecycle API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/routes.ts", "backend/src/assessment/testService.ts"]
+    },
+    "Unit 19": {
+      "name": "Timed Assessment UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/assessment/TimedAssessmentModal.tsx"]
+    },
+    "Unit 20": {
+      "name": "Scoring & 80% Verification Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/testService.ts", "backend/src/skills/service.ts"]
+    },
+    "Unit 21": {
+      "name": "Attempt Limit Enforcement (3/Month)",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/assessment/routes.ts (attempts-status endpoint and start check)"]
+    },
+    "Unit 22": {
+      "name": "Unlock Progression Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/skills/service.ts (evaluatePrerequisites)"]
+    },
+    "Unit 23": {
+      "name": "Verification Artifact Model (SHA-256 HMAC)",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/portfolio/proofService.ts", "backend/src/portfolio/types.ts"]
+    },
+    "Unit 24": {
+      "name": "Portfolio Persistence & Compilation",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/portfolio/portfolioService.ts"]
+    },
+    "Unit 25": {
+      "name": "Public Profile & Verification API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/portfolio/routes.ts (/api/portfolio/verify/:proofId)"]
+    },
+    "Unit 26": {
+      "name": "Shareable Portfolio UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/portfolio/PortfolioView.tsx", "frontend/src/components/portfolio/PublicVerificationModal.tsx"]
+    },
+    "Unit 27": {
+      "name": "Proof Card Generator & SVG Badge",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/portfolio/VerificationProofCard.tsx", "frontend/src/components/portfolio/ProofCardModal.tsx", "backend/src/portfolio/proofService.ts (generateProofBadgeSvg)"]
+    },
+    "Unit 28": {
+      "name": "Job Posting Schema & Seed Postings",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/career/types.ts", "backend/src/career/jobPostingService.ts"]
+    },
+    "Unit 29": {
+      "name": "Deterministic Job Match Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/career/jobMatchEngine.ts"]
+    },
+    "Unit 30": {
+      "name": "Skill Gap Analysis Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/career/jobGapEngine.ts"]
+    },
+    "Unit 31": {
+      "name": "Job Analyzer API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/career/routes.ts"]
+    },
+    "Unit 32": {
+      "name": "Job Match & Gap UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/career/JobAnalyzerView.tsx"]
+    },
+    "Unit 33": {
+      "name": "Interview Question Bank & Rubrics",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/interview/interviewQuestionBankService.ts"]
+    },
+    "Unit 34": {
+      "name": "Interview Session Engine",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/interview/interviewSessionService.ts"]
+    },
+    "Unit 35": {
+      "name": "AI Response Evaluator (Heuristic/Rubric)",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/interview/interviewEvaluatorService.ts"]
+    },
+    "Unit 36": {
+      "name": "STAR Method Feedback Formatter",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/interview/starFeedbackFormatterService.ts"]
+    },
+    "Unit 37": {
+      "name": "Interview Prep API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/interview/routes.ts"]
+    },
+    "Unit 38": {
+      "name": "Mock Interview UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/interview/MockInterviewView.tsx"]
+    },
+    "Unit 39": {
+      "name": "Canvas & Node Render Model",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/visualizer/layoutEngine.ts", "frontend/src/components/visualizer/SkillGraphCanvas.tsx", "frontend/src/components/visualizer/types.ts"]
+    },
+    "Unit 40": {
+      "name": "Dependency Traversal Engine",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/visualizer/traversalEngine.ts"]
+    },
+    "Unit 41": {
+      "name": "Skill Profile Overlay HUD",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/visualizer/SkillProfileOverlay.tsx"]
+    },
+    "Unit 42": {
+      "name": "Visualizer Controls & MiniMap",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/visualizer/VisualizerControls.tsx", "frontend/src/components/visualizer/MiniMap.tsx", "frontend/src/components/roadmap/RoadmapView.tsx"]
+    },
+    "Unit 43": {
+      "name": "Score Components & Normalization",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/ranking/scoreEngine.ts", "backend/src/ranking/types.ts"]
+    },
+    "Unit 44": {
+      "name": "Hiresense Competency Score & Leaderboard API",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/ranking/rankingService.ts", "backend/src/ranking/routes.ts", "frontend/src/lib/rankingApi.ts"]
+    },
+    "Unit 45": {
+      "name": "Leaderboard & Readiness UI",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/ranking/LeaderboardView.tsx", "frontend/src/components/ranking/ScoreOverviewCard.tsx", "frontend/src/components/ranking/LeaderboardTable.tsx", "frontend/src/components/ranking/DistributionAnalytics.tsx", "frontend/src/components/ranking/CandidateScoreModal.tsx"]
+    },
+    "Unit 46": {
+      "name": "Resume Text Extraction",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/resume/resumeExtractor.ts", "backend/src/resume/routes.ts", "frontend/src/lib/resumeApi.ts", "frontend/src/components/resume/ResumeView.tsx", "backend/src/resume/resumeVerification.test.ts"],
+      "notes": "Backend REST API, client library, and user-facing ResumeView.tsx UI integrated"
+    },
+    "Unit 47": {
+      "name": "Resume Skill Extraction & Ingestion UI",
+      "status": "COMPLETE",
+      "evidence": ["backend/src/resume/skillExtractor.ts", "backend/src/resume/routes.ts", "frontend/src/components/resume/ResumeView.tsx", "frontend/src/App.tsx", "backend/src/resume/skillExtractionVerification.test.ts", "backend/src/resume/liveEndpointVerification.test.ts"],
+      "notes": "Extracts skills strictly as UNVERIFIED self-claims; candidate review and claim import UI integrated into App.tsx"
+    },
+    "Unit 48": {
+      "name": "Domain Diagnostic Assessment",
+      "status": "BACKEND COMPLETE / UI MISSING",
+      "evidence": ["backend/src/assessment/diagnosticService.ts", "backend/src/assessment/routes.ts", "frontend/src/lib/diagnosticApi.ts", "backend/src/assessment/diagnosticVerification.test.ts"],
+      "notes": "Multi-skill assessment session generator with isolated scoring; frontend UI missing"
+    },
+    "Unit 49": {
+      "name": "Assessment Integrity Signals",
+      "status": "COMPLETE",
+      "evidence": ["frontend/src/components/assessment/useAssessmentIntegrity.ts", "frontend/src/components/assessment/TimedAssessmentModal.tsx", "frontend/src/components/assessment/AssessmentResultView.tsx", "backend/src/assessment/testService.ts", "backend/src/assessment/integrityVerification.test.ts"]
+    },
+    "Unit 50": {
+      "name": "GitHub Activity Analysis",
+      "status": "PLANNED",
+      "evidence": ["context/specs/00-build-plan.md"],
+      "notes": "Not yet implemented"
+    },
+    "Unit 51": {
+      "name": "Additional Leaderboard Scopes",
+      "status": "PLANNED",
+      "evidence": ["context/specs/00-build-plan.md"],
+      "notes": "Global, Domain, and Institution scopes already supported in Unit 44/45; individual skill scope deferred"
+    },
+    "Units 52-56": {
+      "name": "Phase 9 Integration & Freeze",
+      "status": "PLANNED",
+      "evidence": ["context/specs/00-build-plan.md"],
+      "notes": "End-to-end hardening, security audit, and demo preparation"
+    }
+  },
+  "endpoints": [
+    {"method": "GET", "path": "/api/health", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/auth/me", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/users/profile", "auth": true, "status": "VERIFIED"},
+    {"method": "PUT", "path": "/api/users/profile", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/roadmap/domains", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/roadmap/:domainSlug", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/skills/roadmap/:domainSlug", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/skills/my-skills", "auth": true, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/skills/claim", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/skills/verified-profile", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/resources/:skillSlug", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/start", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/attempt/:attemptId", "auth": true, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/submit", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/history", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/attempts-status/:skillId", "auth": true, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/diagnostic/generate", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/diagnostic/:diagnosticId", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/diagnostic/submit", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/portfolio/me", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/portfolio/verify/:proofId", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/portfolio/badge/:proofId", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/portfolio/id/:userId", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/portfolio/:username", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/career/jobs", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/career/jobs/:jobId", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/career/jobs", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/career/parse", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/career/match/:jobId", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/career/match-text", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/interview/questions", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/interview/questions/:questionId", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/sessions", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/interview/sessions", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/interview/sessions/:sessionId", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/sessions/:sessionId/answer", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/sessions/:sessionId/skip", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/sessions/:sessionId/abandon", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/sessions/:sessionId/evaluate", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/interview/evaluate-answer", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/ranking/my-score", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/ranking/score/:userId", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/ranking/leaderboard", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/ranking/distribution", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/resume/extract-text", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/resume/parse-raw", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/resume/extract-skills", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/resume/import-claims", "auth": false, "status": "VERIFIED"}
+  ],
+  "databaseSchema": {
+    "migrationCount": 1,
+    "migrationFile": "database/migrations/001_initial_schema.sql",
+    "seedFile": "database/seeds/001_initial_seeds.sql",
+    "tablesInMigration": [
+      "profiles",
+      "domains",
+      "roadmaps",
+      "skills",
+      "skill_dependencies",
+      "user_skills",
+      "question_banks",
+      "questions",
+      "tests",
+      "test_attempts",
+      "job_analyses",
+      "job_requirements",
+      "interview_sessions",
+      "interview_questions",
+      "interview_answers"
+    ],
+    "codeExpectedUnmigratedTables": [
+      "verification_proofs (used in proofService.ts)",
+      "job_postings (used in jobPostingService.ts)"
+    ]
+  },
+  "coreAlgorithms": {
+    "hiresenseCompetencyScore": "S_composite = 0.40 * S_mastery + 0.20 * S_difficulty + 0.15 * S_coverage + 0.15 * S_project + 0.10 * S_interview",
+    "skillVerificationThreshold": "Passing score >= 80.0% enforced server-side",
+    "attemptLimitRule": "Maximum 3 completed attempts per skill per calendar month (UTC)",
+    "integrityPenalty": "Score = max(0, 100 - (10*tabSwitches + 15*fullscreenExits + 5*clipboardViolations)). Disqualify if tabSwitches > 3 OR score < 60",
+    "cryptographicProofSignature": "HMAC-SHA256(userId + ':' + skillId + ':' + score + ':' + attemptId + ':' + verificationDate, PROOF_SECRET_KEY)",
+    "jobCompatibilityScore": "Sum of weights of matched verified skills / Sum of weights of all required/preferred job skills * 100",
+    "dagTopologicalSort": "Kahn's Algorithm / DFS cycle validation & prerequisite ancestor resolution"
+  },
+  "knownDiscrepanciesAndTechnicalDebt": {
+    "critical": [],
+    "important": [
+      "Database schema migration 001 is missing tables referenced in later backend services (verification_proofs, job_postings). Runtime handles this gracefully by catching Supabase errors and falling back to in-memory Maps.",
+      "Units 46 (Resume Extraction), 47 (Resume Skill Extraction), and 48 (Domain Diagnostic) have complete backend endpoints and frontend client libraries, but lack dedicated UI views in the React frontend.",
+      "ProfileView component exists in frontend/src/components/profile/ProfileView.tsx but is not mounted in the main App.tsx navigation tabs."
+    ],
+    "minor": [
+      "Backend src/ai/index.ts and src/projects/index.ts are 3-line boundary placeholders.",
+      "Interview evaluation and resume skill extraction use deterministic keyword/regex heuristic analysis rather than live commercial LLM API calls."
+    ]
+  }
+}

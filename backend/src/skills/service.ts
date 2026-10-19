@@ -205,7 +205,11 @@ export class SkillService {
   /**
    * User declares/claims a skill (Invariant: NEVER verified automatically)
    */
-  public async claimSkill(userId: string, skillId: string): Promise<UserSkillDTO> {
+  public async claimSkill(
+    userId: string,
+    skillId: string,
+    status: UserSkillStatus = 'UNVERIFIED'
+  ): Promise<UserSkillDTO> {
     let existing = await this.getUserSkill(userId, skillId);
 
     if (existing) {
@@ -221,7 +225,7 @@ export class SkillService {
       id: randomUUID(),
       userId,
       skillId,
-      status: 'CLAIMED',
+      status,
       verificationScore: null,
       verificationDate: null,
       attemptCount: 0,
@@ -239,7 +243,7 @@ export class SkillService {
           id: newRecord.id,
           user_id: newRecord.userId,
           skill_id: newRecord.skillId,
-          status: 'CLAIMED',
+          status: newRecord.status,
           created_at: newRecord.createdAt,
           updated_at: newRecord.updatedAt,
         });
@@ -249,6 +253,21 @@ export class SkillService {
     }
 
     return newRecord;
+  }
+
+  /**
+   * Helper for tests to clean up state
+   */
+  public clearUserSkillsForTesting(userId?: string): void {
+    if (userId) {
+      for (const [key, record] of this.userSkillsMap.entries()) {
+        if (record.userId === userId) {
+          this.userSkillsMap.delete(key);
+        }
+      }
+    } else {
+      this.userSkillsMap.clear();
+    }
   }
 
   /**
