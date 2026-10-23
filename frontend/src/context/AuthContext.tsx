@@ -5,8 +5,18 @@ export interface UserProfile {
   id: string;
   email: string;
   displayName: string;
-  role: 'student' | 'professional' | 'admin';
+  role: 'STUDENT' | 'MONITORING_ADMIN' | 'MAIN_ADMIN' | 'student' | 'professional' | 'admin';
   institution?: string;
+  collegeId?: string | null;
+  affiliationStatus?: 'UNCLAIMED' | 'PENDING_VERIFICATION' | 'VERIFIED' | 'REJECTED';
+  requestedCollegeName?: string;
+  officialCollegeEmail?: string;
+}
+
+export interface RegisterCollegeAffiliationInput {
+  collegeId?: string;
+  requestedCollegeName?: string;
+  officialCollegeEmail?: string;
 }
 
 interface AuthContextType {
@@ -14,8 +24,15 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<void>;
-  register: (email: string, pass: string, name: string, role: 'student' | 'professional') => Promise<{ sessionCreated: boolean }>;
+  register: (
+    email: string,
+    pass: string,
+    name: string,
+    role?: 'student' | 'professional' | 'STUDENT',
+    collegeAffiliation?: RegisterCollegeAffiliationInput
+  ) => Promise<{ sessionCreated: boolean }>;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +58,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, token]);
 
+  const mapUserFromMetadata = (sessionUser: any): UserProfile => {
+    const metadata = sessionUser.user_metadata || {};
+    return {
+      id: sessionUser.id,
+      email: sessionUser.email || '',
+      displayName: metadata.displayName || metadata.display_name || sessionUser.email?.split('@')[0] || 'User',
+      role: metadata.role || 'STUDENT',
+      institution: metadata.institution,
+      collegeId: metadata.collegeId || null,
+      affiliationStatus: metadata.affiliationStatus || 'UNCLAIMED',
+      requestedCollegeName: metadata.requestedCollegeName,
+      officialCollegeEmail: metadata.officialCollegeEmail,
+    };
+  };
+
+  const refreshProfile = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/colleges/affiliations/my-status', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const body = await res.json();
+        if (body.success && body.data && user) {
+          setUser({
+            ...user,
+            affiliationStatus: body.data.affiliationStatus,
+            collegeId: body.data.collegeId,
+            institution: body.data.college?.name || user.institution,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Failed to refresh affiliation profile:', err);
+    }
+  };
+
   // Session restoration and auth listener
   useEffect(() => {
     let mounted = true;
@@ -56,14 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (session?.user) {
-          const metadata = session.user.user_metadata || {};
-          const restoredUser: UserProfile = {
-            id: session.user.id,
-            email: session.user.email || '',
-            displayName: metadata.displayName || metadata.display_name || session.user.email?.split('@')[0] || 'User',
-            role: metadata.role || 'student',
-            institution: metadata.institution,
-          };
+          const restoredUser = mapUserFromMetadata(session.user);
           setUser(restoredUser);
           setToken(session.access_token);
         } else {
@@ -78,14 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!mounted) return;
 
         if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
-          const metadata = session.user.user_metadata || {};
-          const currentUser: UserProfile = {
-            id: session.user.id,
-            email: session.user.email || '',
-            displayName: metadata.displayName || metadata.display_name || session.user.email?.split('@')[0] || 'User',
-            role: metadata.role || 'student',
-            institution: metadata.institution,
-          };
+          const currentUser = mapUserFromMetadata(session.user);
           setUser(currentUser);
           setToken(session.access_token);
         } else if (event === 'SIGNED_OUT') {
@@ -132,26 +172,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (data.session && data.user) {
-          const metadata = data.user.user_metadata || {};
-          const userProfile: UserProfile = {
-            id: data.user.id,
-            email: data.user.email || email,
-            displayName: metadata.displayName || metadata.display_name || email.split('@')[0],
-            role: metadata.role || 'student',
-            institution: metadata.institution,
-          };
+          const userProfile = mapUserFromMetadata(data.user);
           setUser(userProfile);
           setToken(data.session.access_token);
         }
       } else {
         // Fallback in-memory mock dev auth
+        let role: UserProfile['role'] = 'STUDENT';
+        let id = 'usr-' + Math.random().toString(36).substring(2, 9);
+        let mockToken = 'mock-dev-token';
+
+        if (email.toLowerCase().includes('admin')) {
+          role = 'MAIN_ADMIN';
+          id = '00000000-0000-0000-0000-000000000002';
+          mockToken = 'mock-main-admin-token';
+        }
+
         const mockUser: UserProfile = {
-          id: 'usr-' + Math.random().toString(36).substring(2, 9),
+          id,
           email,
           displayName: email.split('@')[0],
-          role: 'student',
+          role,
+          affiliationStatus: 'UNCLAIMED',
         };
-        const mockToken = 'mock-dev-token';
         setUser(mockUser);
         setToken(mockToken);
       }
@@ -164,10 +207,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string,
     pass: string,
     name: string,
-    role: 'student' | 'professional'
+    _role: 'student' | 'professional' | 'STUDENT' = 'STUDENT',
+    collegeAffiliation?: RegisterCollegeAffiliationInput
   ): Promise<{ sessionCreated: boolean }> => {
     setLoading(true);
     try {
+      const initialAffiliationStatus = (collegeAffiliation?.collegeId || collegeAffiliation?.requestedCollegeName)
+        ? 'PENDING_VERIFICATION'
+        : 'UNCLAIMED';
+
       if (isSupabaseConfigured() && supabase) {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -175,7 +223,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           options: {
             data: {
               displayName: name,
-              role: role,
+              role: 'STUDENT',
+              collegeId: collegeAffiliation?.collegeId || null,
+              requestedCollegeName: collegeAffiliation?.requestedCollegeName,
+              officialCollegeEmail: collegeAffiliation?.officialCollegeEmail,
+              affiliationStatus: initialAffiliationStatus,
             },
           },
         });
@@ -189,10 +241,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             id: data.user.id,
             email: data.user.email || email,
             displayName: name || email.split('@')[0],
-            role: role,
+            role: 'STUDENT',
+            collegeId: collegeAffiliation?.collegeId || null,
+            requestedCollegeName: collegeAffiliation?.requestedCollegeName,
+            officialCollegeEmail: collegeAffiliation?.officialCollegeEmail,
+            affiliationStatus: initialAffiliationStatus,
           };
           setUser(userProfile);
           setToken(data.session.access_token);
+
+          // If college affiliation was requested, sync request to backend
+          if (collegeAffiliation?.collegeId || collegeAffiliation?.requestedCollegeName) {
+            fetch('/api/colleges/affiliations/request', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${data.session.access_token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(collegeAffiliation),
+            }).catch((err) => console.warn('[Auth] Affiliation request sync deferred:', err));
+          }
+
           return { sessionCreated: true };
         } else {
           return { sessionCreated: false };
@@ -203,7 +272,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: 'usr-' + Math.random().toString(36).substring(2, 9),
           email,
           displayName: name || email.split('@')[0],
-          role,
+          role: 'STUDENT',
+          collegeId: collegeAffiliation?.collegeId || null,
+          requestedCollegeName: collegeAffiliation?.requestedCollegeName,
+          officialCollegeEmail: collegeAffiliation?.officialCollegeEmail,
+          affiliationStatus: initialAffiliationStatus,
         };
         const mockToken = 'mock-dev-token';
         setUser(mockUser);
@@ -228,7 +301,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -113,6 +113,30 @@ Update this file after every meaningful implementation change.
     - Updated `skillService` and `proofService` to support live Supabase persistence using user tokens and backend admin credentials (`onConflict: 'user_id,skill_id'`, `onConflict: 'proof_id'`).
     - Verified real Supabase PostgreSQL persistence and server restart recovery against live project `ctlptseuqbwcyvrnohfo.supabase.co`.
     - Authored 8-scenario integration test suite in `backend/src/assessment/diagnosticSecurityPersistence.test.ts`.
+  - **Multi-College Role-Based Platform & Centralized Content (COMPLETE)**:
+    - Implemented 3 canonical enterprise roles: `STUDENT`, `MONITORING_ADMIN`, and `MAIN_ADMIN` with database constraint updates.
+    - Migration `database/migrations/004_multi_college_roles_and_courses.sql` creating `colleges`, `monitoring_admin_colleges`, `student_affiliation_requests`, `courses`, `course_modules`, `course_subtopics`, `course_resources`, and `admin_audit_logs`.
+    - Authorization middleware in `backend/src/auth/middleware.ts` (`requireRole`, `requireCollegeAccess`, active account status checks).
+    - College Management & Student Affiliation in `backend/src/colleges/`:
+      - Approved colleges public discovery (`/api/colleges/approved`).
+      - Student affiliation requests (`/api/colleges/affiliations/request`) with status tracking (`UNCLAIMED`, `PENDING_VERIFICATION`, `VERIFIED`, `REJECTED`).
+      - Mandatory institution registration notice in UI and optional official college email.
+      - Main Admin review and approval workflow (`/api/admin/affiliations/:id`).
+    - Monitoring Admin Provisioning & Strict Isolation:
+      - Main Admin provisioning (`/api/admin/monitoring-admins/invite`) with multi-college assignments and account suspension/reactivation.
+      - Multi-college isolation: Monitoring Admins can only query and export analytics/students for assigned colleges; all other college access strictly blocked with HTTP 403.
+      - College CSV export (`/api/colleges/monitoring/:collegeId/export-csv`).
+    - Centralized Learning Courses & Question Bank in `backend/src/courses/`:
+      - Hierarchy: Course → Module → Subtopic → Learning Resources & Assessment Questions.
+      - Lifecycle support: Draft, Edit, Publish, Archive.
+      - Centralized Question Bank authoring with server-side answer key validation.
+    - Frontend User Interfaces:
+      - `AuthModal.tsx`: Updated with approved college dropdown, custom college requests, and recommended official college email.
+      - `MainAdminDashboard.tsx`: Platform overview, college administration, affiliation requests, monitoring admin controls, and audit logs.
+      - `MonitoringAdminDashboard.tsx`: Multi-college switcher, student counts, pass rates, skill gaps, verified roster, and CSV export.
+      - `CourseCatalogView.tsx`: Modular syllabus viewer with learning outcomes, prerequisites, and resource links.
+      - Navigation & Header in `App.tsx`: Dynamic role-based navigation tabs and verified institution badge.
+    - Authored and verified 12-scenario automated test suite in `backend/src/colleges/collegeAdminSecurity.test.ts` (12/12 passed with zero failures).
 
 ## In Progress
 

@@ -14,6 +14,8 @@ import { careerRouter } from './career/index.js';
 import { interviewRouter } from './interview/index.js';
 import { rankingRouter } from './ranking/index.js';
 import { resumeRouter } from './resume/index.js';
+import { collegesRouter, adminRouter } from './colleges/index.js';
+import { coursesRouter } from './courses/index.js';
 
 dotenv.config();
 
@@ -35,7 +37,9 @@ app.use('/api/career', careerRouter);
 app.use('/api/interview', interviewRouter);
 app.use('/api/ranking', rankingRouter);
 app.use('/api/resume', resumeRouter);
-
+app.use('/api/colleges', collegesRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/courses', coursesRouter);
 
 // Health check endpoint
 app.get('/api/health', (_req: Request, res: Response) => {

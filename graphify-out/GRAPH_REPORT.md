@@ -1,16 +1,16 @@
-# Graph Report - Hiresence_AI  (2026-10-18)
+# Graph Report - Hiresence_AI  (2026-10-23)
 
 ## Corpus Check
-- 902 files · ~691,727 words
+- 924 files · ~716,155 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 11669 nodes · 12648 edges · 878 communities (845 shown, 24 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 164 edges (avg confidence: 0.87)
+- 11802 nodes · 13009 edges · 881 communities (846 shown, 25 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 166 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0bfaae07`
+- Built from commit: `4458c708`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -30,10 +30,10 @@
 - backend/package.json
 - assessmentApi.ts
 - compilerOptions
-- isSupabaseConfigured
+- SkillService
 - ai/index.ts
 - projects/index.ts
-- _update_registry
+- isSupabaseConfigured
 - shared.mjs
 - test_parse_instinct.py
 - Python Development Patterns
@@ -60,9 +60,9 @@
 - visualizer/types.ts
 - Rust Development Patterns
 - ObservationEvent
-- useAuth
+- App.tsx
 - LeaderboardView.tsx
-- _make_project
+- _cmd_projects_merge
 - Django Security Best Practices
 - Kotlin Exposed Patterns
 - Rust Testing Patterns
@@ -86,7 +86,7 @@
 - Laravel Testing with TDD
 - Code Examples
 - Redis Patterns
-- _promote_specific
+- _make_project
 - Deployment Patterns
 - Quality & Non-Conformance Management
 - Quarkus Development Patterns
@@ -162,7 +162,7 @@
 - Open-Source Pipeline Skill
 - Phase 2: Cross-read, Match & Verdict (LLM Judgment)
 - SwiftUI Patterns
-- Unit 03
+- migrationFiles
 - code-reviewer.md
 - gan-evaluator.md
 - Review Checklist
@@ -178,7 +178,7 @@
 - X API
 - Plan - Multi-Model Collaborative Planning
 - Hiresense_AI — Architecture Context
-- evidence
+- suites
 - Hiresense_AI — Architecture Context
 - HarmonyOS / ArkTS Patterns
 - React Patterns
@@ -192,7 +192,7 @@
 - Santa Method
 - Security Scan Skill
 - Execute - Multi-Model Collaborative Execution
-- evidence
+- courses/service.ts
 - Hiresense_AI — UI Context
 - Hiresense_AI — UI Context
 - a11y-architect.md
@@ -316,6 +316,7 @@
 - Continuous Learning Skill - DEPRECATED
 - observer-loop.sh
 - observe.sh
+- resumeApi.ts
 - DeFi AMM Security
 - Documentation Lookup (Context7)
 - Email Ops
@@ -427,7 +428,7 @@
 - PRD Command
 - Process
 - users/service.ts
-- unitInventory
+- Unit 05
 - evidence
 - evidence
 - C++ Build Error Resolver
@@ -465,7 +466,7 @@
 - /skill-create - Local Skill Generation
 - Hiresense_AI — Master AI Project Context Document
 - Hiresense_AI — Academic Report & Viva Voce Knowledge Base
-- phases
+- phase7_ranking
 - Design
 - Hiresense_AI
 - Analysis Process
@@ -564,11 +565,11 @@
 - Update Codemaps
 - resources/service.ts
 - 6. Chapter 5: Detailed Module Specifications
-- knownDiscrepanciesAndTechnicalDebt
+- detect_project
 - evidence
 - Unit 45 Specification — Leaderboard & Readiness UI
 - Unit 48 Specification — Domain Diagnostic
-- diagnosticApi.ts
+- DomainDiagnosticView.tsx
 - C# Security
 - F# Patterns
 - F# Security
@@ -623,7 +624,7 @@
 - 12. Viva Voce Comprehensive Defense Guide (30 Questions & Answers)
 - verificationStatus
 - coreAlgorithms
-- evidence
+- 3. Server-Side Performance (HIGH)
 - Unit 01 Specification — Repository and App Skeleton
 - Unit 02 Specification — Environment and Supabase Connection
 - Unit 04 Specification — Authentication API
@@ -669,7 +670,7 @@
 - Step 3：推导底线规则
 - Parallel Execution Optimizer
 - 1. Eliminating Waterfalls (CRITICAL)
-- 2. Bundle Size Optimization (CRITICAL)
+- Router Lifecycle and Events
 - Recursive Decision Ledger
 - Examples
 - Cost Report
@@ -721,6 +722,7 @@
 - Low-Score Example: Adding Retry Logic
 - Side Effects with `effect` and `afterRenderEffect`
 - Component Host Elements
+- phase8_advanced_extensions
 - Continuous Agent Loop
 - Classes & Class Hierarchies (C.*)
 - 3. Widget Best Practices
@@ -787,9 +789,9 @@
 - 3.2 In-Scope vs. Out-of-Scope Specifications
 - phase0_foundation
 - phase1_roadmap
-- phase2_assessment
+- phases
 - phase3_portfolio
-- phase4_career
+- Unit 37
 - phase5_interview
 - phase6_visualizer
 - phase9_freeze
@@ -801,7 +803,7 @@
 - Unit 21
 - Unit 22
 - Unit 24
-- Unit 25
+- unitInventory
 - Unit 29
 - Unit 30
 - Unit 31
@@ -887,15 +889,15 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `unitInventory` - 53 edges
-2. `_make_project()` - 27 edges
-3. `isSupabaseConfigured()` - 27 edges
-4. `grade()` - 26 edges
-5. `getSupabaseClient()` - 26 edges
-6. `_load_instincts_from_dir()` - 24 edges
-7. `Examples` - 24 edges
-8. `useAuth()` - 23 edges
-9. `ObservationEvent` - 21 edges
-10. `Java Coding Standards` - 20 edges
+2. `isSupabaseConfigured()` - 46 edges
+3. `getSupabaseClient()` - 45 edges
+4. `useAuth()` - 29 edges
+5. `CollegeService` - 28 edges
+6. `_make_project()` - 27 edges
+7. `grade()` - 26 edges
+8. `_load_instincts_from_dir()` - 24 edges
+9. `Examples` - 24 edges
+10. `SkillService` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `test_normalize_remote_url_empty_returns_empty()` --calls--> `_normalize_remote_url()`  [INFERRED]
@@ -912,27 +914,27 @@
 ## Import Cycles
 - None detected.
 
-## Communities (878 total, 24 thin omitted)
+## Communities (881 total, 25 thin omitted)
 
 ### Community 0 - "interview/types.ts"
 Cohesion: 0.09
-Nodes (23): InterviewEvaluatorService, InterviewQuestionBankService, InterviewSessionService, StarFeedbackFormatterService, CreateInterviewSessionInput, EvaluationPerformanceTier, InterviewDifficulty, InterviewQuestionDTO (+15 more)
+Nodes (24): InterviewEvaluatorService, InterviewQuestionBankService, InterviewSessionService, router, StarFeedbackFormatterService, CreateInterviewSessionInput, EvaluationPerformanceTier, InterviewDifficulty (+16 more)
 
 ### Community 1 - "devDependencies"
-Cohesion: 0.06
-Nodes (35): autoprefixer, dependencies, lucide-react, react, react-dom, devDependencies, autoprefixer, postcss (+27 more)
+Cohesion: 0.05
+Nodes (37): autoprefixer, dependencies, lucide-react, react, react-dom, @supabase/supabase-js, devDependencies, autoprefixer (+29 more)
 
 ### Community 2 - "careerApi.ts"
 Cohesion: 0.10
 Nodes (21): JobAnalyzerView(), loadJobs(), JobAnalyzerViewProps, analyzeJobMatch(), analyzeJobMatchText(), CareerGapAnalysis, CreateJobPostingInput, EmploymentType (+13 more)
 
 ### Community 3 - "assessment/types.ts"
-Cohesion: 0.09
-Nodes (26): DomainDiagnosticService, InternalDiagnosticSession, DiagnosticAnswerSubmission, DiagnosticQuestionItemDTO, DiagnosticSubmissionRequestDTO, DomainDiagnosticEvaluationDTO, DomainDiagnosticRequestDTO, PublicDomainDiagnosticDTO (+18 more)
+Cohesion: 0.08
+Nodes (28): DomainDiagnosticService, InternalDiagnosticSession, DiagnosticAnswerSubmission, DiagnosticQuestionItemDTO, DiagnosticSubmissionRequestDTO, DomainDiagnosticEvaluationDTO, DomainDiagnosticRequestDTO, PublicDomainDiagnosticDTO (+20 more)
 
 ### Community 4 - "src/index.ts"
-Cohesion: 0.15
-Nodes (13): router, requireAuth(), router, AuthenticatedRequest, AuthenticatedUser, router, ApiResponse, app (+5 more)
+Cohesion: 0.13
+Nodes (20): router, requireAuth(), requireCollegeAccess(), requireRole(), router, AnyRole, AuthenticatedRequest, AuthenticatedUser (+12 more)
 
 ### Community 5 - "career/types.ts"
 Cohesion: 0.12
@@ -955,8 +957,8 @@ Cohesion: 0.08
 Nodes (23): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModules, jsx, lib, module, moduleResolution (+15 more)
 
 ### Community 10 - "proofService.ts"
-Cohesion: 0.19
-Nodes (8): PortfolioService, ProofService, CandidatePortfolioDTO, CreateProofParams, PortfolioStatsDTO, PublicProofCardDTO, VerificationProofDTO, VerificationStatus
+Cohesion: 0.15
+Nodes (13): ApiResponse, getSupabaseAdminClient(), getSupabaseServiceKey(), getSupabaseUrl(), isSupabaseAdminConfigured(), PortfolioService, ProofService, CandidatePortfolioDTO (+5 more)
 
 ### Community 11 - "PortfolioView.tsx"
 Cohesion: 0.20
@@ -974,21 +976,17 @@ Nodes (20): AssessmentResultView(), AssessmentResultViewProps, TimedAssessmentMo
 Cohesion: 0.14
 Nodes (13): compilerOptions, esModuleInterop, forceConsistentCasingInFileNames, module, moduleResolution, outDir, resolveJsonModule, rootDir (+5 more)
 
-### Community 15 - "isSupabaseConfigured"
-Cohesion: 0.20
-Nodes (6): TestService, TestAttemptDTO, getSupabaseClient(), isSupabaseConfigured(), SkillService, UserSkillDTO
-
-### Community 18 - "_update_registry"
-Cohesion: 0.22
-Nodes (9): Serialize registry read-modify-write across concurrent sessions. Acquires the…, Update the projects.json registry. Uses file locking (where available) to…, _registry_lock(), _update_registry(), test_update_registry_atomic_replaces_file(), test_update_registry_heals_malformed_entry(), test_update_registry_heals_non_dict_registry(), test_update_registry_matches_shell_schema() (+1 more)
+### Community 18 - "isSupabaseConfigured"
+Cohesion: 0.13
+Nodes (16): CollegeService, AdminAuditLogDTO, AffiliationStatus, AssignmentStatus, CollegeAnalyticsDTO, CollegeDTO, CollegeStatus, CreateCollegeInput (+8 more)
 
 ### Community 23 - "shared.mjs"
 Cohesion: 0.05
 Nodes (55): contextDirPath, projects, resolved, resolved, cargo, claudeMd, gitConfig, goMod (+47 more)
 
 ### Community 24 - "test_parse_instinct.py"
-Cohesion: 0.07
-Nodes (45): cmd_prune(), _normalize_remote_url(), parse_instinct_file(), Validate and resolve a file path, guarding against path traversal. Raises…, Delete pending instincts older than the TTL threshold., Parse YAML-like instinct file format. Each instinct is delimited by a pair of…, _validate_file_path(), _pending_item() (+37 more)
+Cohesion: 0.05
+Nodes (56): cmd_prune(), _normalize_remote_url(), parse_instinct_file(), Validate and resolve a file path, guarding against path traversal. Raises…, Delete pending instincts older than the TTL threshold., Update the projects.json registry. Uses file locking (where available) to…, Parse YAML-like instinct file format. Each instinct is delimited by a pair of…, _update_registry() (+48 more)
 
 ### Community 25 - "Python Development Patterns"
 Cohesion: 0.04
@@ -999,8 +997,8 @@ Cohesion: 0.04
 Nodes (48): 10. Dependency Security, 1. Secrets Management, 2. Input Validation, 3. SQL Injection Prevention, 4. Authentication & Authorization, 5. XSS Prevention, 6. CSRF Protection, 7. Rate Limiting (+40 more)
 
 ### Community 27 - "instinct-cli.py"
-Cohesion: 0.07
-Nodes (49): _append_observations(), cmd_import(), cmd_promote(), cmd_status(), _collect_pending_dirs(), _collect_pending_instincts(), _confidence_bar(), detect_project() (+41 more)
+Cohesion: 0.08
+Nodes (47): _append_observations(), cmd_export(), cmd_import(), cmd_promote(), cmd_status(), _collect_pending_dirs(), _collect_pending_instincts(), _confidence_bar() (+39 more)
 
 ### Community 28 - "Git Workflow Patterns"
 Cohesion: 0.04
@@ -1086,17 +1084,17 @@ Nodes (36): 1. Ownership and Borrowing, Accept Generics, Return Concrete Types, 
 Cohesion: 0.13
 Nodes (29): classify_events(), _parse_classification(), Classify tool calls against compliance steps using LLM., Classify which tool calls match which compliance steps. Returns {step_id:…, Parse LLM classification output into {step_id: [event_indices]}., _check_temporal_order(), ComplianceResult, Grade observation traces against compliance specs using LLM classification. (+21 more)
 
-### Community 49 - "useAuth"
-Cohesion: 0.09
-Nodes (26): App(), HealthStatus, MainApp(), NavView, AuthModal(), AuthModalProps, ProfileView(), ResumeView() (+18 more)
+### Community 49 - "App.tsx"
+Cohesion: 0.07
+Nodes (33): App(), HealthStatus, MainApp(), NavView, AffiliationRequest, AuditLogItem, CollegeItem, MainAdminDashboard() (+25 more)
 
 ### Community 50 - "LeaderboardView.tsx"
 Cohesion: 0.14
 Nodes (28): CandidateScoreModal(), CandidateScoreModalProps, DistributionAnalytics(), DistributionAnalyticsProps, DOMAIN_OPTIONS, LeaderboardFilters(), LeaderboardFiltersProps, TIER_OPTIONS (+20 more)
 
-### Community 51 - "_make_project"
-Cohesion: 0.06
-Nodes (45): cmd_projects(), _cmd_projects_delete(), _cmd_projects_gc(), _cmd_projects_merge(), load_registry(), _project_counts(), List or maintain known projects and their instinct counts., Load the projects registry. (+37 more)
+### Community 51 - "_cmd_projects_merge"
+Cohesion: 0.07
+Nodes (35): cmd_projects(), _cmd_projects_delete(), _cmd_projects_merge(), load_registry(), _project_counts(), List or maintain known projects and their instinct counts., Serialize registry read-modify-write across concurrent sessions. Acquires the…, Load the projects registry. (+27 more)
 
 ### Community 52 - "Django Security Best Practices"
 Cohesion: 0.06
@@ -1190,9 +1188,9 @@ Nodes (30): Anti-Patterns, Button loading state, Choosing the right advanced API
 Cohesion: 0.06
 Nodes (30): Anti-Patterns, Cache-Aside (Lazy Loading), Cache Invalidation, Cache Miss Stampede Prevention, Cluster Mode, Connection Management, Connection Pooling, Core Patterns (+22 more)
 
-### Community 75 - "_promote_specific"
-Cohesion: 0.17
-Nodes (12): _promote_specific(), Promote a specific instinct by ID from current project to global., dry_run returns 0, prints [DRY RUN], and writes no global file., Promoting nonexistent instinct should fail., Path-like instinct IDs should be rejected before file writes., Promoting an instinct that already exists globally should fail., Promote a project instinct to global with --force., test_promote_specific_already_global() (+4 more)
+### Community 75 - "_make_project"
+Cohesion: 0.07
+Nodes (30): _cmd_projects_gc(), _make_project(), dry_run returns 0, prints [DRY RUN], and writes no global file., Create project directory structure and return a project dict., Should load from both project and global directories., When project and global have same ID, project wins., load_project_only_instincts should NOT include global instincts., No instincts at all should return empty list. (+22 more)
 
 ### Community 76 - "Deployment Patterns"
 Cohesion: 0.07
@@ -1243,8 +1241,8 @@ Cohesion: 0.07
 Nodes (27): API Resources, Caching, Configuration and Environments, Controllers -> Services -> Actions, Custom Casts and Value Objects, Eager Loading to Avoid N+1, Eloquent Model Patterns, Events, Jobs, and Queues (+19 more)
 
 ### Community 88 - "React Performance"
-Cohesion: 0.07
-Nodes (28): 3. Server-Side Performance (HIGH), 4. Client-Side Data Fetching (MEDIUM-HIGH), 7. JavaScript Performance (LOW-MEDIUM), 8. Advanced Patterns (LOW), Attribution, Authenticate Server Actions like API routes, Automated Tools, Avoid duplicate serialization in RSC props (+20 more)
+Cohesion: 0.08
+Nodes (25): 2. Bundle Size Optimization (CRITICAL), 4. Client-Side Data Fetching (MEDIUM-HIGH), 7. JavaScript Performance (LOW-MEDIUM), 8. Advanced Patterns (LOW), Attribution, Automated Tools, Conditional module loading, Deduplicate global event listeners (+17 more)
 
 ### Community 89 - "evaluate.py"
 Cohesion: 0.13
@@ -1363,8 +1361,8 @@ Cohesion: 0.08
 Nodes (22): Best Practices, Context Budget, Examples, How It Works, Phase 1: Inventory, Phase 2: Classify, Phase 3: Detect Issues, Phase 4: Report (+14 more)
 
 ### Community 118 - "_load_instincts_from_dir"
-Cohesion: 0.06
-Nodes (35): cmd_export(), load_all_instincts(), _load_instincts_from_dir(), load_project_only_instincts(), Export instincts to file., Quote a string for safe YAML frontmatter serialization. Uses double quotes and…, Load instincts from a single directory., Load all instincts: project-scoped + global. Project-scoped instincts take… (+27 more)
+Cohesion: 0.09
+Nodes (24): _find_cross_project_instincts(), _load_instincts_from_dir(), Find instincts that appear in multiple projects (promotion candidates). Returns…, Show instincts that could be promoted from project to global., Load instincts from a single directory., _show_promotion_candidates(), Loaded instincts should have _source_file, _source_type, _scope_label., If an instinct has no 'scope' in frontmatter, it should default to scope_label. (+16 more)
 
 ### Community 119 - "Continuous Learning v2.1 - Instinct"
 Cohesion: 0.08
@@ -1443,8 +1441,8 @@ Cohesion: 0.09
 Nodes (21): 1. Persistent Memory, 2. Scheduled Operations (Crons), 3. Dispatch / Remote Agents, 4. Computer Use, 5. Task Queue, Architecture, Autonomous Agent Harness, Autonomous PR Reviewer (+13 more)
 
 ### Community 138 - "cmd_evolve"
-Cohesion: 0.10
-Nodes (24): _assign_unique_slugs(), _cluster_by_keyword_overlap(), cmd_evolve(), _evolved_agent_name(), _evolved_command_name(), _evolved_description(), _evolved_skill_name(), _generate_evolved() (+16 more)
+Cohesion: 0.11
+Nodes (22): _assign_unique_slugs(), _cluster_by_keyword_overlap(), cmd_evolve(), _evolved_agent_name(), _evolved_command_name(), _evolved_description(), _evolved_skill_name(), _generate_evolved() (+14 more)
 
 ### Community 139 - "C++ Testing (Agent Skill)"
 Cohesion: 0.09
@@ -1494,9 +1492,9 @@ Nodes (20): 1a. Collect skill inventory, 1b. Collect rules index, 1c. Present to
 Cohesion: 0.10
 Nodes (20): Anti-Patterns to Avoid, Avoid Expensive Work in body, Environment Injection, Equatable Conformance, Extract Subviews to Limit Invalidation, Navigation, @Observable ViewModel, Performance (+12 more)
 
-### Community 151 - "Unit 03"
-Cohesion: 0.10
-Nodes (21): evidence, name, status, evidence, name, status, evidence, name (+13 more)
+### Community 151 - "migrationFiles"
+Cohesion: 0.08
+Nodes (24): migrationFiles, evidence, name, status, evidence, name, status, evidence (+16 more)
 
 ### Community 152 - "code-reviewer.md"
 Cohesion: 0.10
@@ -1558,9 +1556,9 @@ Nodes (19): 1.1 Prompt Enhancement (MUST execute first), 1.2 Context Retrieval, 
 Cohesion: 0.10
 Nodes (19): AI Boundary, AI Service Contract, Architectural Style, Assessment Rules, Authentication and Access Model, Core Domain Model, External Sources, Hiresense_AI — Architecture Context (+11 more)
 
-### Community 167 - "evidence"
-Cohesion: 0.11
-Nodes (20): suites, evidence, name, notes, status, evidence, name, notes (+12 more)
+### Community 167 - "suites"
+Cohesion: 0.07
+Nodes (34): suites, evidence, name, status, evidence, evidence, name, notes (+26 more)
 
 ### Community 168 - "Hiresense_AI — Architecture Context"
 Cohesion: 0.10
@@ -1614,9 +1612,9 @@ Nodes (18): Auto-Fix, Basic Scan, Critical Findings (fix immediately), GitHub Ac
 Cohesion: 0.11
 Nodes (18): 5.1 Automatic Audit, 5.2 Integrate and Fix, 5.3 Delivery Confirmation, Core Protocols, Execute - Multi-Model Collaborative Execution, Execution Workflow, Key Rules, Multi-Model Call Specification (+10 more)
 
-### Community 181 - "evidence"
-Cohesion: 0.11
-Nodes (19): evidence, name, status, evidence, name, status, evidence, name (+11 more)
+### Community 181 - "courses/service.ts"
+Cohesion: 0.15
+Nodes (13): CourseService, ContentStatus, CourseDifficulty, CourseDTO, CourseModuleDTO, CourseQuestionDTO, CourseResourceDTO, CourseSubtopicDTO (+5 more)
 
 ### Community 182 - "Hiresense_AI — UI Context"
 Cohesion: 0.11
@@ -1647,8 +1645,8 @@ Cohesion: 0.11
 Nodes (17): 1. Define Tasks, 2. Run Agents, 3. Compare Results, Agent Eval Skill, Best Practices, Code-Based (deterministic), Core Concepts, Git Worktree Isolation (+9 more)
 
 ### Community 189 - "angular-developer/SKILL.md"
-Cohesion: 0.08
-Nodes (19): Example: Testing with a `MatButtonHarness`, Key Concepts, Testing with Component Harnesses, Using a Harness in a Unit Test, Why Use Harnesses?, Hierarchical Injectors, `providers` vs `viewProviders`, Resolution Modifiers (+11 more)
+Cohesion: 0.11
+Nodes (14): Example: Testing with a `MatButtonHarness`, Key Concepts, Testing with Component Harnesses, Using a Harness in a Unit Test, Why Use Harnesses?, Hierarchical Injectors, `providers` vs `viewProviders`, Resolution Modifiers (+6 more)
 
 ### Community 190 - "Observer Agent"
 Cohesion: 0.11
@@ -1883,8 +1881,8 @@ Cohesion: 0.12
 Nodes (16): 8.1 Complete Entity Table Catalog, Table 10: `test_attempts`, Table 11: `job_analyses`, Table 12: `job_requirements`, Table 13: `interview_sessions`, Table 14: `interview_questions`, Table 15: `interview_answers`, Table 1: `profiles` (+8 more)
 
 ### Community 249 - "tablesInMigration"
-Cohesion: 0.12
-Nodes (16): tablesInMigration, domains, interview_answers, interview_questions, interview_sessions, job_analyses, job_requirements, profiles (+8 more)
+Cohesion: 0.11
+Nodes (18): tablesInMigration, domains, interview_answers, interview_questions, interview_sessions, job_analyses, job_postings, job_requirements (+10 more)
 
 ### Community 250 - "Unit 50"
 Cohesion: 0.12
@@ -2109,6 +2107,10 @@ Nodes (13): analyze_observations(), claude_process_alive(), cleanup(), cleanup_a
 ### Community 305 - "observe.sh"
 Cohesion: 0.25
 Nodes (13): _CHECK_OBSERVER_RUNNING(), _clv2_bump_signal_counter(), CLV2_PYTHON_CMD, _is_windows_app_installer_stub(), _NOTE_OBSERVER_NOSURVIVE(), PROJECT_ID_ENV, PROJECT_NAME_ENV, _REMOVE_FILE_IF_PRESENT() (+5 more)
+
+### Community 306 - "resumeApi.ts"
+Cohesion: 0.18
+Nodes (14): ResumeView(), ResumeViewProps, ExtractedContactInfo, ExtractedEducationItem, ExtractedExperienceItem, ExtractedProjectItem, ExtractedSkillClaim, extractResumeSkills() (+6 more)
 
 ### Community 307 - "DeFi AMM Security"
 Cohesion: 0.14
@@ -2447,8 +2449,8 @@ Cohesion: 0.17
 Nodes (11): ACL Placement Review, Anti-Patterns, Change-Window Verification, Cisco IOS Patterns, Interface Hygiene, Mode Reference, Operating Rules, Read-Only Collection (+3 more)
 
 ### Community 391 - "_promote_auto"
-Cohesion: 0.11
-Nodes (19): _find_cross_project_instincts(), _promote_auto(), Find instincts that appear in multiple projects (promotion candidates). Returns…, Auto-promote instincts found in multiple projects., Validate instinct IDs before using them in filenames., _validate_instinct_id(), Auto-promote with no cross-project instincts should say so., Dry run should list candidates but not write files. (+11 more)
+Cohesion: 0.17
+Nodes (12): _promote_auto(), Auto-promote instincts found in multiple projects., Validate instinct IDs before using them in filenames., _validate_instinct_id(), Auto-promote with no cross-project instincts should say so., Dry run should list candidates but not write files., Auto-promote with force should write global instinct file., test_promote_auto_dry_run() (+4 more)
 
 ### Community 392 - "Council - External Review"
 Cohesion: 0.17
@@ -2552,19 +2554,19 @@ Nodes (11): Example Output, Notes, Process, Save Session Command, Session File F
 
 ### Community 417 - "users/service.ts"
 Cohesion: 0.38
-Nodes (4): router, UserService, UpdateProfileInput, UserProfileDTO
+Nodes (3): UserService, UpdateProfileInput, UserProfileDTO
 
-### Community 418 - "unitInventory"
-Cohesion: 0.17
-Nodes (12): evidence, name, status, evidence, name, status, unitInventory, Unit 05 (+4 more)
+### Community 418 - "Unit 05"
+Cohesion: 0.33
+Nodes (6): evidence, name, status, Unit 05, frontend/src/components/auth/AuthModal.tsx, frontend/src/context/AuthContext.tsx
 
 ### Community 419 - "evidence"
 Cohesion: 0.17
 Nodes (12): evidence, name, status, evidence, name, status, Unit 12, Unit 42 (+4 more)
 
 ### Community 420 - "evidence"
-Cohesion: 0.17
-Nodes (12): evidence, name, status, evidence, name, status, Unit 19, Unit 49 (+4 more)
+Cohesion: 0.09
+Nodes (23): evidence, name, status, evidence, name, status, evidence, name (+15 more)
 
 ### Community 421 - "C++ Build Error Resolver"
 Cohesion: 0.18
@@ -2706,9 +2708,9 @@ Nodes (10): 12.1 Module-by-Module Verification Status, 12.2 What was Completed B
 Cohesion: 0.18
 Nodes (10): 10.1 Technical & Implementation Limitations, 10. Chapter 9: System Limitations & Architectural Trade-offs, 11.1 Documented Future Enhancements (From Specs), 11.2 Author Recommendations for Enterprise Scale, 11. Chapter 10: Future Enhancements & Commercial Roadmap, 1. Project Metadata & Executive Summary, 9.1 Automated Test Execution Log, 9.2 TypeScript Static Compilation Results (+2 more)
 
-### Community 456 - "phases"
-Cohesion: 0.18
-Nodes (11): completionPercentage, name, status, units, completionPercentage, name, status, units (+3 more)
+### Community 456 - "phase7_ranking"
+Cohesion: 0.40
+Nodes (5): completionPercentage, name, status, units, phase7_ranking
 
 ### Community 457 - "Design"
 Cohesion: 0.18
@@ -2879,8 +2881,8 @@ Cohesion: 0.20
 Nodes (10): 7.1 Health & Auth (`/api/health`, `/api/auth`), 7.2 User Profile (`/api/users`), 7.3 Roadmaps & Skills (`/api/roadmap`, `/api/skills`, `/api/resources`), 7.4 Assessments & Integrity (`/api/assessment`), 7.5 Verification Portfolio & Proofs (`/api/portfolio`), 7.6 Career & Job Analyzer (`/api/career`), 7.7 Mock Interview Engine (`/api/interview`), 7.8 Ranking & Leaderboards (`/api/ranking`) (+2 more)
 
 ### Community 499 - "current-project-state.json"
-Cohesion: 0.20
-Nodes (9): databaseSchema, codeExpectedUnmigratedTables, migrationCount, migrationFile, seedFile, endpoints, $schema, job_postings (used in jobPostingService.ts) (+1 more)
+Cohesion: 0.14
+Nodes (13): databaseSchema, codeExpectedUnmigratedTables, migrationCount, seedFile, endpoints, knownDiscrepanciesAndTechnicalDebt, critical, important (+5 more)
 
 ### Community 500 - "Progress Tracker"
 Cohesion: 0.20
@@ -3102,9 +3104,9 @@ Nodes (4): router, ResourceService, ResourceDTO, ResourceType
 Cohesion: 0.22
 Nodes (9): 6.1 Module 1: Authentication & User Profile (`auth`, `users`), 6.2 Module 2: Roadmap & Skill State Engine (`roadmap`, `skills`), 6.3 Module 3: Skill Graph Visualizer (`frontend/src/components/visualizer/`), 6.4 Module 4: Assessment & Integrity Engine (`assessment`), 6.5 Module 5: Verification Portfolio & Proofs (`portfolio`), 6.6 Module 6: Career Intelligence & Gap Analysis (`career`), 6.7 Module 7: Mock Interview Engine (`interview`), 6.8 Module 8: Competency Ranking & Leaderboards (`ranking`) (+1 more)
 
-### Community 555 - "knownDiscrepanciesAndTechnicalDebt"
-Cohesion: 0.22
-Nodes (9): knownDiscrepanciesAndTechnicalDebt, critical, important, minor, Backend src/ai/index.ts and src/projects/index.ts are 3-line boundary placeholders., Database schema migration 001 is missing tables referenced in later backend services (verification_proofs, job_postings). Runtime handles this gracefully by catching Supabase errors and falling back to in-memory Maps., Interview evaluation and resume skill extraction use deterministic keyword/regex heuristic analysis rather than live commercial LLM API calls., ProfileView component exists in frontend/src/components/profile/ProfileView.tsx but is not mounted in the main App.tsx navigation tabs. (+1 more)
+### Community 555 - "detect_project"
+Cohesion: 0.14
+Nodes (14): detect_project(), _git_repo_root(), _main_worktree_root(), Return the main worktree root when project_root is a linked worktree., Detect current project context. Returns dict with id, name, root, project_dir., _strip_remote_credentials(), When no git and no env var, should return global project., CLAUDE_PROJECT_DIR env var should be used as project root. (+6 more)
 
 ### Community 556 - "evidence"
 Cohesion: 0.22
@@ -3118,9 +3120,9 @@ Nodes (8): 1. Component Architecture, 2. Key UI Features, 3. Invariants Protecte
 Cohesion: 0.22
 Nodes (8): 1. Data Contracts (`backend/src/assessment/diagnosticTypes.ts`), 2. Diagnostic Assessment Lifecycle & Invariant Protection, 3. REST API Endpoints (`backend/src/assessment/routes.ts`), Dependencies, Design, Goal, Unit 48 Specification — Domain Diagnostic, Verification Checklist
 
-### Community 559 - "diagnosticApi.ts"
-Cohesion: 0.22
-Nodes (5): DiagnosticAnswerSubmission, DiagnosticQuestionItem, DomainDiagnosticEvaluation, PublicDomainDiagnostic, SkillDiagnosticBreakdown
+### Community 559 - "DomainDiagnosticView.tsx"
+Cohesion: 0.18
+Nodes (14): DiagnosticPhase, DomainDiagnosticView(), DomainDiagnosticViewProps, DEFAULT_DIAGNOSTIC_TRACKS, DiagnosticAnswerSubmission, DiagnosticQuestionItem, DiagnosticTrack, DiagnosticTrackSkill (+6 more)
 
 ### Community 560 - "C# Security"
 Cohesion: 0.25
@@ -3338,9 +3340,9 @@ Nodes (8): failedSuites, passedSuites, totalSuites, verificationStatus, automate
 Cohesion: 0.25
 Nodes (8): coreAlgorithms, attemptLimitRule, cryptographicProofSignature, dagTopologicalSort, hiresenseCompetencyScore, integrityPenalty, jobCompatibilityScore, skillVerificationThreshold
 
-### Community 614 - "evidence"
-Cohesion: 0.25
-Nodes (8): evidence, name, status, Unit 01, backend/package.json, backend/src/index.ts, frontend/package.json, frontend/src/App.tsx
+### Community 614 - "3. Server-Side Performance (HIGH)"
+Cohesion: 0.20
+Nodes (10): 3. Server-Side Performance (HIGH), Authenticate Server Actions like API routes, Avoid duplicate serialization in RSC props, Hoist static I/O to module scope, LRU cache for cross-request data, Minimize data passed to Client Components, No mutable module-level state in RSC/SSR, Parallelize nested fetches with Promise.all per item (+2 more)
 
 ### Community 615 - "Unit 01 Specification — Repository and App Skeleton"
 Cohesion: 0.25
@@ -3479,8 +3481,8 @@ Cohesion: 0.52
 Nodes (6): _clv2_detect_project(), _clv2_main_worktree_root(), _clv2_normalize_remote_url(), _clv2_resolve_python_cmd(), _clv2_update_project_registry(), detect-project.sh script
 
 ### Community 649 - "_validate_import_url"
-Cohesion: 0.22
-Nodes (9): _fetch_import_url(), Validate remote instinct imports before opening a network connection., Fetch a validated remote instinct file with bounded size and timeout., _validate_import_url(), Remote imports should not downgrade to plaintext HTTP., Remote imports should not resolve to private or loopback addresses., test_validate_import_url_allows_public_https(), test_validate_import_url_rejects_http() (+1 more)
+Cohesion: 0.29
+Nodes (7): Validate remote instinct imports before opening a network connection., _validate_import_url(), Remote imports should not downgrade to plaintext HTTP., Remote imports should not resolve to private or loopback addresses., test_validate_import_url_allows_public_https(), test_validate_import_url_rejects_http(), test_validate_import_url_rejects_private_hosts()
 
 ### Community 650 - "Data Throughput Accelerator"
 Cohesion: 0.29
@@ -3522,9 +3524,9 @@ Nodes (6): Core Pattern, Execution Rules, Failure Modes, Lane Matrix, Output Sha
 Cohesion: 0.29
 Nodes (7): 1. Eliminating Waterfalls (CRITICAL), Cheap conditions before await, Defer awaits until used, Partial dependencies — start early, await late, Promise.all for independent work, Server Components: parallel through composition, Suspense for streaming
 
-### Community 660 - "2. Bundle Size Optimization (CRITICAL)"
-Cohesion: 0.29
-Nodes (7): 2. Bundle Size Optimization (CRITICAL), Conditional module loading, Defer third-party scripts, Direct imports, not barrels, Dynamic imports for heavy components, Preload on hover/focus, Statically analyzable paths
+### Community 660 - "Router Lifecycle and Events"
+Cohesion: 0.33
+Nodes (5): Common Router Events (Chronological), Common Use Cases, Debugging, Router Lifecycle and Events, Subscribing to Events
 
 ### Community 661 - "Recursive Decision Ledger"
 Cohesion: 0.29
@@ -3729,6 +3731,10 @@ Nodes (5): Basic Usage, DOM Manipulation with `afterRenderEffect`, Render Phases
 ### Community 711 - "Component Host Elements"
 Cohesion: 0.33
 Nodes (5): Binding Collisions, Binding to the Host Element, Component Host Elements, Injecting Host Attributes, Legacy Decorators
+
+### Community 712 - "phase8_advanced_extensions"
+Cohesion: 0.40
+Nodes (5): completionPercentage, name, status, units, phase8_advanced_extensions
 
 ### Community 713 - "Continuous Agent Loop"
 Cohesion: 0.33
@@ -3994,17 +4000,17 @@ Nodes (5): completionPercentage, name, status, units, phase0_foundation
 Cohesion: 0.40
 Nodes (5): completionPercentage, name, status, units, phase1_roadmap
 
-### Community 779 - "phase2_assessment"
-Cohesion: 0.40
-Nodes (5): completionPercentage, name, status, units, phase2_assessment
+### Community 779 - "phases"
+Cohesion: 0.18
+Nodes (11): completionPercentage, name, status, units, completionPercentage, name, status, units (+3 more)
 
 ### Community 780 - "phase3_portfolio"
 Cohesion: 0.40
 Nodes (5): completionPercentage, name, status, units, phase3_portfolio
 
-### Community 781 - "phase4_career"
+### Community 781 - "Unit 37"
 Cohesion: 0.40
-Nodes (5): completionPercentage, name, status, units, phase4_career
+Nodes (5): evidence, name, status, Unit 37, backend/src/interview/routes.ts
 
 ### Community 782 - "phase5_interview"
 Cohesion: 0.40
@@ -4050,9 +4056,9 @@ Nodes (5): evidence, name, status, Unit 22, backend/src/skills/service.ts (evalu
 Cohesion: 0.40
 Nodes (5): evidence, name, status, Unit 24, backend/src/portfolio/portfolioService.ts
 
-### Community 793 - "Unit 25"
-Cohesion: 0.40
-Nodes (5): evidence, name, status, Unit 25, backend/src/portfolio/routes.ts (/api/portfolio/verify/:proofId)
+### Community 793 - "unitInventory"
+Cohesion: 0.14
+Nodes (14): evidence, name, status, name, notes, status, name, notes (+6 more)
 
 ### Community 794 - "Unit 29"
 Cohesion: 0.40
@@ -4295,24 +4301,24 @@ Cohesion: 0.67
 Nodes (3): 4.1 Functional Requirements (FR), 4.2 Non-Functional Requirements (NFR), 4. Chapter 3: System Requirements Specification (SRS)
 
 ## Knowledge Gaps
-- **7851 isolated node(s):** `resolved`, `contextDirPath`, `projects`, `resolved`, `projects` (+7846 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 8502 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7879 isolated node(s):** `resolved`, `contextDirPath`, `projects`, `resolved`, `projects` (+7874 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 8530 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `React Performance` connect `React Performance` to `5. Re-render Optimization (MEDIUM)`, `react-patterns/SKILL.md`, `1. Eliminating Waterfalls (CRITICAL)`, `2. Bundle Size Optimization (CRITICAL)`, `6. Rendering Performance (MEDIUM)`?**
+- **Why does `React Performance` connect `React Performance` to `3. Server-Side Performance (HIGH)`, `5. Re-render Optimization (MEDIUM)`, `react-patterns/SKILL.md`, `1. Eliminating Waterfalls (CRITICAL)`, `6. Rendering Performance (MEDIUM)`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `unitInventory` connect `unitInventory` to `Unit 09`, `Unit 10`, `Unit 11`, `Unit 13`, `Unit 17`, `Unit 21`, `Unit 22`, `Unit 03`, `Unit 24`, `Unit 25`, `Unit 29`, `Unit 30`, `Unit 31`, `Unit 32`, `Unit 33`, `evidence`, `evidence`, `evidence`, `evidence`, `evidence`, `Unit 34`, `Unit 35`, `Unit 36`, `Unit 38`, `evidence`, `Unit 40`, `Unit 41`, `evidence`, `evidence`, `evidence`, `evidence`, `Unit 04`, `Unit 06`, `Unit 07`, `Unit 23`, `Unit 26`, `Unit 28`, `Unit 43`, `evidence`, `current-project-state.json`, `Unit 50`?**
+- **Why does `6. Rendering Performance (MEDIUM)` connect `6. Rendering Performance (MEDIUM)` to `React Performance`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `unitInventory` connect `unitInventory` to `Unit 37`, `Unit 09`, `Unit 10`, `Unit 11`, `Unit 13`, `Unit 17`, `Unit 21`, `Unit 22`, `migrationFiles`, `Unit 24`, `Unit 29`, `Unit 30`, `Unit 31`, `Unit 32`, `Unit 33`, `Unit 34`, `evidence`, `evidence`, `Unit 05`, `evidence`, `evidence`, `evidence`, `Unit 35`, `suites`, `Unit 36`, `Unit 38`, `evidence`, `Unit 40`, `Unit 41`, `evidence`, `evidence`, `Unit 04`, `Unit 06`, `Unit 07`, `Unit 23`, `Unit 26`, `Unit 28`, `Unit 43`, `current-project-state.json`, `Unit 50`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `grade()` (e.g. with `ComplianceSpec` and `ObservationEvent`) actually correct?**
-  _`grade()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `resolved`, `contextDirPath`, `projects` to the rest of the system?**
-  _7851 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _7879 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `interview/types.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08897959183673469 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08627450980392157 - nodes in this community are weakly interconnected._
 - **Should `devDependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.05555555555555555 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
 - **Should `careerApi.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10153846153846154 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09686609686609686 - nodes in this community are weakly interconnected._

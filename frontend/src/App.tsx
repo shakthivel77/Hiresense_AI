@@ -8,9 +8,39 @@ import { MockInterviewView } from './components/interview';
 import { LeaderboardView } from './components/ranking';
 import { ResumeView } from './components/resume';
 import { DomainDiagnosticView } from './components/diagnostic';
-import { Terminal, Shield, Cpu, BookOpen, Award, Target, MessageSquare, BarChart3, LogIn, LogOut, UserCheck, ArrowRight, FileText } from 'lucide-react';
+import { MainAdminDashboard, MonitoringAdminDashboard } from './components/admin';
+import { CourseCatalogView } from './components/courses';
+import {
+  Terminal,
+  Shield,
+  Cpu,
+  BookOpen,
+  Award,
+  Target,
+  MessageSquare,
+  BarChart3,
+  LogIn,
+  LogOut,
+  UserCheck,
+  ArrowRight,
+  FileText,
+  Building2,
+  ShieldCheck,
+  School,
+} from 'lucide-react';
 
-type NavView = 'dashboard' | 'roadmap' | 'resume' | 'diagnostic' | 'assessment' | 'career' | 'interview' | 'leaderboard';
+type NavView =
+  | 'dashboard'
+  | 'courses'
+  | 'roadmap'
+  | 'resume'
+  | 'diagnostic'
+  | 'assessment'
+  | 'career'
+  | 'interview'
+  | 'leaderboard'
+  | 'mainAdmin'
+  | 'monitoringAdmin';
 
 interface HealthStatus {
   status: string;
@@ -42,15 +72,21 @@ function MainApp() {
       });
   }, []);
 
+  const isMainAdmin = user?.role === 'MAIN_ADMIN' || user?.role === 'admin';
+  const isMonitoringAdmin = user?.role === 'MONITORING_ADMIN' || isMainAdmin;
+
   const navItems = [
     { id: 'dashboard' as NavView, label: 'Dashboard', icon: Terminal },
-    { id: 'roadmap' as NavView, label: 'Roadmap', icon: BookOpen },
+    { id: 'courses' as NavView, label: 'Course Catalog', icon: BookOpen },
+    { id: 'roadmap' as NavView, label: 'Roadmap', icon: Cpu },
     { id: 'resume' as NavView, label: 'Resume Ingestion', icon: FileText },
     { id: 'diagnostic' as NavView, label: 'Domain Diagnostic', icon: Award },
     { id: 'assessment' as NavView, label: 'Verified Portfolio', icon: Shield },
     { id: 'career' as NavView, label: 'Career Gap', icon: Target },
     { id: 'interview' as NavView, label: 'AI Mock Interview', icon: MessageSquare },
     { id: 'leaderboard' as NavView, label: 'Leaderboard', icon: BarChart3 },
+    ...(isMonitoringAdmin ? [{ id: 'monitoringAdmin' as NavView, label: 'College Portal', icon: Building2 }] : []),
+    ...(isMainAdmin ? [{ id: 'mainAdmin' as NavView, label: 'Main Admin', icon: ShieldCheck }] : []),
   ];
 
   return (
@@ -67,13 +103,18 @@ function MainApp() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.id;
+              const isAdminTab = item.id === 'mainAdmin' || item.id === 'monitoringAdmin';
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors text-left font-medium ${
                     isActive
-                      ? 'bg-elevated text-accent-primary'
+                      ? isAdminTab
+                        ? 'bg-elevated text-accent-secondary border border-accent-secondary/30'
+                        : 'bg-elevated text-accent-primary'
+                      : isAdminTab
+                      ? 'text-accent-secondary/80 hover:text-accent-secondary hover:bg-elevated/50'
                       : 'text-muted hover:text-primary hover:bg-elevated/50'
                   }`}
                 >
@@ -106,13 +147,12 @@ function MainApp() {
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-14 border-b border-border bg-surface/50 px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            {/* Mobile nav indicator */}
             <div className="flex items-center gap-2 md:hidden">
               <Cpu className="h-5 w-5 text-accent-primary" />
               <span className="font-bold text-sm">Hiresense</span>
             </div>
             <h1 className="text-xs font-medium text-muted hidden sm:block">
-              Hiresense_AI — Competency Verification Engine
+              Hiresense_AI — Multi-College Competency Verification Platform
             </h1>
           </div>
 
@@ -123,6 +163,23 @@ function MainApp() {
                   <UserCheck className="h-3.5 w-3.5 text-state-success" />
                   <span className="font-medium">{user.displayName}</span>
                   <span className="text-muted capitalize">({user.role})</span>
+
+                  {user.institution && (
+                    <span className="text-[10px] text-accent-secondary border-l border-border pl-2 font-mono flex items-center gap-1">
+                      <School className="h-3 w-3" />
+                      {user.institution}
+                      {user.affiliationStatus === 'VERIFIED' && (
+                        <span className="text-[9px] text-state-success font-bold bg-state-success/10 px-1 rounded">
+                          VERIFIED
+                        </span>
+                      )}
+                      {user.affiliationStatus === 'PENDING_VERIFICATION' && (
+                        <span className="text-[9px] text-amber-400 font-bold bg-amber-500/10 px-1 rounded">
+                          PENDING
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={logout}
@@ -146,7 +203,22 @@ function MainApp() {
 
         {/* Dynamic View Body */}
         <div className="p-6 max-w-6xl mx-auto w-full flex-1">
-          {activeView === 'roadmap' ? (
+          {activeView === 'courses' ? (
+            <CourseCatalogView
+              onNavigateToRoadmap={(domainSlug) => {
+                setRoadmapTarget({ domainSlug });
+                setActiveView('roadmap');
+              }}
+              onNavigateToDiagnostic={(domainSlug) => {
+                setDiagnosticTarget({ domainSlug });
+                setActiveView('diagnostic');
+              }}
+            />
+          ) : activeView === 'mainAdmin' ? (
+            <MainAdminDashboard />
+          ) : activeView === 'monitoringAdmin' ? (
+            <MonitoringAdminDashboard />
+          ) : activeView === 'roadmap' ? (
             <RoadmapView
               initialDomainSlug={roadmapTarget?.domainSlug}
               initialSkillId={roadmapTarget?.skillId}
@@ -199,9 +271,9 @@ function MainApp() {
               <div className="bg-surface rounded-xl p-6 border border-border">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-primary">Hiresense_AI Workspace</h2>
+                    <h2 className="text-xl font-semibold text-primary">Hiresense_AI Multi-College Workspace</h2>
                     <p className="text-sm text-muted mt-1">
-                      Learn → Assess → Verify → Build Competency Profile → Analyze Career Gap → Practice Interview → Measure Readiness
+                      Learn Courses → Assess → Verify → Build Competency Profile → Benchmark Institution → Practice Interview
                     </p>
                   </div>
                   <Award className="h-8 w-8 text-accent-secondary" />
@@ -210,6 +282,26 @@ function MainApp() {
 
               {/* Quick Actions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-accent-primary/30 flex flex-col justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-primary px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
+                      Curriculum
+                    </span>
+                    <h3 className="text-base font-bold text-primary mt-2">Centralized Courses</h3>
+                    <p className="text-xs text-muted mt-1">
+                      Browse official modular courses, verified resources, and direct skill assessments.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveView('courses')}
+                    className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-base font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span>Open Catalog</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
                 <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-accent-primary/30 flex flex-col justify-between gap-4">
                   <div>
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-primary px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
@@ -224,7 +316,7 @@ function MainApp() {
                     onClick={() => setActiveView('roadmap')}
                     className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-base font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
                   >
-                    <BookOpen className="h-4 w-4" />
+                    <Cpu className="h-4 w-4" />
                     <span>Open Roadmap</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
@@ -233,7 +325,7 @@ function MainApp() {
                 <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-amber-500/30 flex flex-col justify-between gap-4">
                   <div>
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                      Phase 8 Ingestion
+                      Resume Ingestion
                     </span>
                     <h3 className="text-base font-bold text-primary mt-2">Upload Candidate Resume</h3>
                     <p className="text-xs text-muted mt-1">
@@ -242,30 +334,10 @@ function MainApp() {
                   </div>
                   <button
                     onClick={() => setActiveView('resume')}
-                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                    className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-black font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
                   >
                     <FileText className="h-4 w-4" />
-                    <span>Ingest Resume</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-
-                <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-state-success/30 flex flex-col justify-between gap-4">
-                  <div>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-state-success px-2 py-0.5 rounded bg-state-success/10 border border-state-success/20">
-                      Unit 48 Diagnostic
-                    </span>
-                    <h3 className="text-base font-bold text-primary mt-2">Domain Diagnostic</h3>
-                    <p className="text-xs text-muted mt-1">
-                      Test multi-skill competency across domains and verify claims with server-side &gt;= 80% passing standards.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setActiveView('diagnostic')}
-                    className="flex items-center gap-2 bg-state-success hover:bg-state-success/90 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
-                  >
-                    <Award className="h-4 w-4" />
-                    <span>Take Diagnostic</span>
+                    <span>Upload Resume</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -273,76 +345,25 @@ function MainApp() {
                 <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-purple-500/30 flex flex-col justify-between gap-4">
                   <div>
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
-                      Phase 7 Active Feature
+                      Domain Diagnostic
                     </span>
-                    <h3 className="text-base font-bold text-primary mt-2">Competency Leaderboard</h3>
+                    <h3 className="text-base font-bold text-primary mt-2">Assess Domain Mastery</h3>
                     <p className="text-xs text-muted mt-1">
-                      Inspect your 5-component competency score and compare across global and university rankings.
+                      Take multi-skill diagnostic assessments, earn cryptographic proofs, and verify claims.
                     </p>
                   </div>
                   <button
-                    onClick={() => setActiveView('leaderboard')}
-                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                    onClick={() => setActiveView('diagnostic')}
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
                   >
-                    <BarChart3 className="h-4 w-4" />
-                    <span>View Leaderboard</span>
+                    <Award className="h-4 w-4" />
+                    <span>Take Diagnostic</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-surface rounded-lg p-5 border border-border">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-2">Backend & Auth</h3>
-                  <div className="font-mono text-sm">
-                    {loading ? (
-                      <span className="text-state-warning">Checking...</span>
-                    ) : health ? (
-                      <div className="space-y-1">
-                        <p className="text-state-success font-medium">{health.name}</p>
-                        <p className="text-xs text-muted">
-                          Supabase Configured: {health.supabaseConfigured ? 'Yes' : 'Dev Mode'}
-                        </p>
-                      </div>
-                    ) : (
-                      <span className="text-state-error font-medium">Backend Offline</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-surface rounded-lg p-5 border border-border">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-2">Verification Invariant</h3>
-                  <p className="text-xs text-muted leading-relaxed">
-                    Self-declared skills & resume claims remain <span className="text-state-warning font-mono">UNVERIFIED</span> until passing a backend assessment with <span className="text-accent-primary font-mono">&gt;= 80%</span>.
-                  </p>
-                </div>
-
-                <div className="bg-surface rounded-lg p-5 border border-border">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-2">User Session</h3>
-                  <p className="text-xs text-muted leading-relaxed">
-                    {user ? (
-                      <span className="text-state-success font-mono">Authenticated as {user.email}</span>
-                    ) : (
-                      <span className="text-muted font-mono">Unauthenticated (Click Sign In to authenticate)</span>
-                    )}
-                  </p>
-                </div>
-              </div>
             </div>
-          ) : (
-            <div className="p-12 text-center bg-surface rounded-2xl border border-border space-y-3">
-              <h3 className="text-lg font-bold text-primary capitalize">{activeView} Module</h3>
-              <p className="text-xs text-muted max-w-md mx-auto">
-                This module is scheduled in subsequent build plan phases. Currently focusing on Phase 1 (Roadmap & Skill Progression).
-              </p>
-              <button
-                onClick={() => setActiveView('roadmap')}
-                className="inline-flex items-center gap-2 text-xs text-accent-primary font-medium hover:underline pt-2"
-              >
-                <BookOpen className="h-3.5 w-3.5" /> Go to Active Roadmap
-              </button>
-            </div>
-          )}
+          ) : null}
         </div>
       </main>
 
@@ -351,7 +372,7 @@ function MainApp() {
   );
 }
 
-export default function App() {
+export function App() {
   return (
     <AuthProvider>
       <MainApp />
@@ -359,3 +380,4 @@ export default function App() {
   );
 }
 
+export default App;
