@@ -7,9 +7,10 @@ import { JobAnalyzerView } from './components/career';
 import { MockInterviewView } from './components/interview';
 import { LeaderboardView } from './components/ranking';
 import { ResumeView } from './components/resume';
+import { DomainDiagnosticView } from './components/diagnostic';
 import { Terminal, Shield, Cpu, BookOpen, Award, Target, MessageSquare, BarChart3, LogIn, LogOut, UserCheck, ArrowRight, FileText } from 'lucide-react';
 
-type NavView = 'dashboard' | 'roadmap' | 'resume' | 'assessment' | 'career' | 'interview' | 'leaderboard';
+type NavView = 'dashboard' | 'roadmap' | 'resume' | 'diagnostic' | 'assessment' | 'career' | 'interview' | 'leaderboard';
 
 interface HealthStatus {
   status: string;
@@ -22,6 +23,7 @@ interface HealthStatus {
 function MainApp() {
   const [activeView, setActiveView] = useState<NavView>('dashboard');
   const [roadmapTarget, setRoadmapTarget] = useState<{ domainSlug?: string; skillId?: string } | null>(null);
+  const [diagnosticTarget, setDiagnosticTarget] = useState<{ domainSlug?: string; targetSkillIds?: string[] } | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -44,6 +46,7 @@ function MainApp() {
     { id: 'dashboard' as NavView, label: 'Dashboard', icon: Terminal },
     { id: 'roadmap' as NavView, label: 'Roadmap', icon: BookOpen },
     { id: 'resume' as NavView, label: 'Resume Ingestion', icon: FileText },
+    { id: 'diagnostic' as NavView, label: 'Domain Diagnostic', icon: Award },
     { id: 'assessment' as NavView, label: 'Verified Portfolio', icon: Shield },
     { id: 'career' as NavView, label: 'Career Gap', icon: Target },
     { id: 'interview' as NavView, label: 'AI Mock Interview', icon: MessageSquare },
@@ -154,6 +157,21 @@ function MainApp() {
                 setRoadmapTarget({ domainSlug, skillId });
                 setActiveView('roadmap');
               }}
+              onNavigateToDiagnostic={(domainSlug, targetSkillIds) => {
+                setDiagnosticTarget({ domainSlug, targetSkillIds });
+                setActiveView('diagnostic');
+              }}
+            />
+          ) : activeView === 'diagnostic' ? (
+            <DomainDiagnosticView
+              initialDomainSlug={diagnosticTarget?.domainSlug}
+              initialTargetSkillIds={diagnosticTarget?.targetSkillIds}
+              onNavigateToRoadmap={(domainSlug, skillId) => {
+                setRoadmapTarget({ domainSlug, skillId });
+                setActiveView('roadmap');
+              }}
+              onNavigateToPortfolio={() => setActiveView('assessment')}
+              onOpenAuthModal={() => setAuthModalOpen(true)}
             />
           ) : activeView === 'assessment' ? (
             <PortfolioView />
@@ -191,7 +209,7 @@ function MainApp() {
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-accent-primary/30 flex flex-col justify-between gap-4">
                   <div>
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-primary px-2 py-0.5 rounded bg-accent-primary/10 border border-accent-primary/20">
@@ -228,6 +246,26 @@ function MainApp() {
                   >
                     <FileText className="h-4 w-4" />
                     <span>Ingest Resume</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <div className="bg-gradient-to-r from-elevated to-surface rounded-xl p-5 border border-state-success/30 flex flex-col justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-state-success px-2 py-0.5 rounded bg-state-success/10 border border-state-success/20">
+                      Unit 48 Diagnostic
+                    </span>
+                    <h3 className="text-base font-bold text-primary mt-2">Domain Diagnostic</h3>
+                    <p className="text-xs text-muted mt-1">
+                      Test multi-skill competency across domains and verify claims with server-side &gt;= 80% passing standards.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveView('diagnostic')}
+                    className="flex items-center gap-2 bg-state-success hover:bg-state-success/90 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap self-start"
+                  >
+                    <Award className="h-4 w-4" />
+                    <span>Take Diagnostic</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>

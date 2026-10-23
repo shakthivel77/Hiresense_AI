@@ -5,7 +5,12 @@ import {
   CreateProofParams,
 } from './types.js';
 import { roadmapService } from '../roadmap/service.js';
-import { isSupabaseConfigured, getSupabaseClient } from '../common/supabase.js';
+import {
+  isSupabaseConfigured,
+  getSupabaseClient,
+  isSupabaseAdminConfigured,
+  getSupabaseAdminClient,
+} from '../common/supabase.js';
 
 const PROOF_SECRET_KEY = process.env.PROOF_SECRET_KEY || 'hiresense_ai_immutable_proof_signature_key_2026';
 
@@ -24,7 +29,9 @@ export class ProofService {
     attemptId: string,
     verificationDate: string
   ): string {
-    const rawData = `${userId}:${skillId}:${score}:${attemptId}:${verificationDate}`;
+    const normalizedDate = new Date(verificationDate).toISOString();
+    const normalizedScore = Number(score).toFixed(2);
+    const rawData = `${userId}:${skillId}:${normalizedScore}:${attemptId}:${normalizedDate}`;
     return createHmac('sha256', PROOF_SECRET_KEY).update(rawData).digest('hex');
   }
 
@@ -44,7 +51,10 @@ export class ProofService {
    * Create and record an immutable Verification Proof Artifact
    * Invariant: Requires score >= 80.0
    */
-  public async createProofArtifact(params: CreateProofParams): Promise<VerificationProofDTO> {
+  public async createProofArtifact(
+    params: CreateProofParams,
+    token?: string
+  ): Promise<VerificationProofDTO> {
     if (params.score < 80.0) {
       throw new Error(
         `Cannot issue verification proof: score ${params.score}% is below authoritative threshold (80%).`
@@ -90,31 +100,37 @@ export class ProofService {
       proofUrl: `/verify/${proofId}`,
     };
 
+    if (isSupabaseConfigured()) {
+      const client = token
+        ? getSupabaseClient(token)
+        : (isSupabaseAdminConfigured() ? getSupabaseAdminClient() : getSupabaseClient());
+
+      const { error } = await client.from('verification_proofs').upsert({
+        id: proof.id,
+        proof_id: proof.proofId,
+        user_id: proof.userId,
+        skill_id: proof.skillId,
+        score: proof.score,
+        attempt_id: proof.attemptId,
+        verification_date: proof.verificationDate,
+        verification_hash: proof.verificationHash,
+        issuer: proof.issuer,
+        status: proof.status,
+      }, { onConflict: 'proof_id' });
+
+      if (error) {
+        console.error('[ProofService] Supabase persistence error:', error.message);
+        throw new Error(`Database persistence failed for proof artifact: ${error.message}`);
+      }
+    }
+
     this.proofsMap.set(proof.proofId, proof);
     this.idToProofIdMap.set(proof.id, proof.proofId);
 
     const userList = this.userProofsMap.get(params.userId) || [];
-    userList.push(proof.proofId);
-    this.userProofsMap.set(params.userId, userList);
-
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = getSupabaseClient();
-        await supabase.from('verification_proofs').upsert({
-          id: proof.id,
-          proof_id: proof.proofId,
-          user_id: proof.userId,
-          skill_id: proof.skillId,
-          score: proof.score,
-          attempt_id: proof.attemptId,
-          verification_date: proof.verificationDate,
-          verification_hash: proof.verificationHash,
-          issuer: proof.issuer,
-          status: proof.status,
-        });
-      } catch (err) {
-        console.warn('[ProofService] Supabase sync deferred:', err);
-      }
+    if (!userList.includes(proof.proofId)) {
+      userList.push(proof.proofId);
+      this.userProofsMap.set(params.userId, userList);
     }
 
     return proof;
@@ -136,17 +152,100 @@ export class ProofService {
   }
 
   /**
-   * Retrieve proof record by shareable Proof ID
+   * Retrieve proof record by shareable Proof ID (checks memory then Supabase)
    */
   public async getProofByProofId(proofId: string): Promise<VerificationProofDTO | null> {
     const formattedId = proofId.trim().toUpperCase();
-    return this.proofsMap.get(formattedId) || null;
+    const inMem = this.proofsMap.get(formattedId);
+    if (inMem) return inMem;
+
+    if (isSupabaseConfigured()) {
+      try {
+        const client = getSupabaseClient();
+        const { data, error } = await client
+          .from('verification_proofs')
+          .select('*')
+          .eq('proof_id', formattedId)
+          .single();
+
+        if (!error && data) {
+          const skillMeta = roadmapService.getSkillById(data.skill_id);
+          const proof: VerificationProofDTO = {
+            id: data.id,
+            proofId: data.proof_id,
+            userId: data.user_id,
+            candidateName: 'Verified Candidate',
+            skillId: data.skill_id,
+            skillName: skillMeta ? skillMeta.name : data.skill_id,
+            category: skillMeta ? skillMeta.category : 'core',
+            difficulty: skillMeta ? skillMeta.difficulty : 'intermediate',
+            score: Number(data.score),
+            passingScore: 80.0,
+            attemptId: data.attempt_id,
+            verificationDate: data.verification_date,
+            verificationHash: data.verification_hash,
+            issuer: data.issuer,
+            status: data.status,
+            proofUrl: `/verify/${data.proof_id}`,
+          };
+          this.proofsMap.set(formattedId, proof);
+          return proof;
+        }
+      } catch (err) {
+        console.warn('[ProofService] Supabase fetch proof error:', err);
+      }
+    }
+
+    return null;
   }
 
   /**
-   * Retrieve all proof records for a candidate
+   * Retrieve all proof records for a candidate (checks memory then Supabase)
    */
-  public async getUserProofs(userId: string): Promise<VerificationProofDTO[]> {
+  public async getUserProofs(userId: string, token?: string): Promise<VerificationProofDTO[]> {
+    if (isSupabaseConfigured()) {
+      try {
+        const client = token
+          ? getSupabaseClient(token)
+          : (isSupabaseAdminConfigured() ? getSupabaseAdminClient() : getSupabaseClient());
+
+        const { data, error } = await client
+          .from('verification_proofs')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (!error && data) {
+          const list: VerificationProofDTO[] = data.map((d) => {
+            const skillMeta = roadmapService.getSkillById(d.skill_id);
+            return {
+              id: d.id,
+              proofId: d.proof_id,
+              userId: d.user_id,
+              candidateName: 'Verified Candidate',
+              skillId: d.skill_id,
+              skillName: skillMeta ? skillMeta.name : d.skill_id,
+              category: skillMeta ? skillMeta.category : 'core',
+              difficulty: skillMeta ? skillMeta.difficulty : 'intermediate',
+              score: Number(d.score),
+              passingScore: 80.0,
+              attemptId: d.attempt_id,
+              verificationDate: d.verification_date,
+              verificationHash: d.verification_hash,
+              issuer: d.issuer,
+              status: d.status,
+              proofUrl: `/verify/${d.proof_id}`,
+            };
+          });
+          for (const item of list) {
+            this.proofsMap.set(item.proofId, item);
+          }
+          return list;
+        }
+      } catch (err) {
+        console.warn('[ProofService] Supabase fetch user proofs error:', err);
+      }
+    }
+
     const proofIds = this.userProofsMap.get(userId) || [];
     return proofIds
       .map((id) => this.proofsMap.get(id))

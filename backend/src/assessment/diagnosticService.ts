@@ -10,6 +10,7 @@ import {
 import { QuestionDTO, QuestionDifficulty } from './types.js';
 import { questionBankService } from './questionBankService.js';
 import { proofService } from '../portfolio/proofService.js';
+import { skillService } from '../skills/service.js';
 
 interface InternalDiagnosticSession {
   diagnosticId: string;
@@ -21,6 +22,7 @@ interface InternalDiagnosticSession {
   expiresAt: string;
   questions: Array<QuestionDTO & { skillId: string; skillName: string; category: string }>;
   testedSkillIds: string[];
+  completed?: boolean;
 }
 
 export class DomainDiagnosticService {
@@ -252,6 +254,36 @@ export class DomainDiagnosticService {
   };
 
   /**
+   * Fetches the metadata and skill list for all supported domain tracks.
+   */
+  public getAvailableTracks(): Array<{
+    slug: string;
+    name: string;
+    description: string;
+    totalSkills: number;
+    skills: Array<{ id: string; name: string; category: string; difficulty: QuestionDifficulty; questionCount: number }>;
+  }> {
+    return Object.entries(DomainDiagnosticService.DOMAIN_TRACKS).map(([slug, track]) => ({
+      slug,
+      name: track.name,
+      description:
+        slug === 'backend-developer'
+          ? 'Core backend systems: Node.js Architecture, PostgreSQL Indexing, and REST API Security.'
+          : slug === 'frontend-developer'
+          ? 'Modern client engineering: React State Management and TypeScript Strict Patterns.'
+          : 'Modern intelligent systems: PyTorch Deep Learning and Vector Embeddings for AI/RAG.',
+      totalSkills: track.skills.length,
+      skills: track.skills.map((s) => ({
+        id: s.id,
+        name: s.name,
+        category: s.category,
+        difficulty: s.difficulty,
+        questionCount: s.questions.length,
+      })),
+    }));
+  }
+
+  /**
    * Generates a targeted multi-skill domain diagnostic assessment.
    */
   public async generateDomainDiagnostic(
@@ -329,11 +361,15 @@ export class DomainDiagnosticService {
   }
 
   /**
-   * Fetches active public diagnostic session.
+   * Fetches active public diagnostic session with ownership verification.
    */
-  public getDiagnostic(diagnosticId: string): PublicDomainDiagnosticDTO | null {
+  public getDiagnostic(diagnosticId: string, requestingUserId?: string): PublicDomainDiagnosticDTO | null {
     const session = this.activeDiagnostics.get(diagnosticId);
     if (!session) return null;
+
+    if (requestingUserId && session.userId && session.userId !== requestingUserId) {
+      throw new Error('Access denied: You do not own this diagnostic session.');
+    }
 
     return {
       diagnosticId: session.diagnosticId,
@@ -365,6 +401,21 @@ export class DomainDiagnosticService {
     const session = this.activeDiagnostics.get(submission.diagnosticId);
     if (!session) {
       throw new Error(`Diagnostic session '${submission.diagnosticId}' not found or expired`);
+    }
+
+    // Ownership check: Prevent one user from submitting another user's session
+    if (session.userId && submission.userId && session.userId !== submission.userId) {
+      throw new Error('Access denied: You do not own this diagnostic session.');
+    }
+
+    if (session.completed) {
+      throw new Error(`Diagnostic session '${submission.diagnosticId}' has already been submitted and evaluated.`);
+    }
+
+    const now = new Date();
+    const expiryTime = new Date(session.expiresAt).getTime() + 60000;
+    if (now.getTime() > expiryTime) {
+      throw new Error(`Diagnostic session '${submission.diagnosticId}' has expired.`);
     }
 
     const answerMap = new Map<string, number>();
@@ -417,33 +468,37 @@ export class DomainDiagnosticService {
 
       let proofId: string | undefined = undefined;
 
+      // 1. Synchronize skill verification status with Skill Engine
+      // Protected invariant: Once a skill is VERIFIED, recordVerificationResult prevents downgrade even on score < 80.
+      if (submission.userId) {
+        await skillService.recordVerificationResult(
+          submission.userId,
+          skillId,
+          score,
+          submission.token
+        );
+      }
+
+      // 2. Issue proof artifact ONLY for verified assessment results
       if (isVerified) {
-        try {
-          const proof = await proofService.createProofArtifact({
-            userId: submission.userId || 'candidate-user',
+        const proof = await proofService.createProofArtifact(
+          {
+            userId: submission.userId,
             candidateName: 'Verified Candidate',
             skillId,
             score,
             attemptId: session.diagnosticId,
             verificationDate: new Date().toISOString(),
-          });
-          proofId = proof.proofId;
-          newlyVerifiedProofs.push({
-            skillId,
-            skillName: stats.skillName,
-            proofId: proof.proofId,
-            score,
-          });
-        } catch (err) {
-          console.warn(`Proof generation deferred for skill ${skillId}`, err);
-          proofId = `PRF-${skillId.toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-          newlyVerifiedProofs.push({
-            skillId,
-            skillName: stats.skillName,
-            proofId,
-            score,
-          });
-        }
+          },
+          submission.token
+        );
+        proofId = proof.proofId;
+        newlyVerifiedProofs.push({
+          skillId,
+          skillName: stats.skillName,
+          proofId: proof.proofId,
+          score,
+        });
       } else {
         recommendedRemediations.push({
           skillId,
@@ -474,6 +529,8 @@ export class DomainDiagnosticService {
 
     const verifiedSkillsCount = skillBreakdown.filter((s) => s.verified).length;
     const unverifiedSkillsCount = skillBreakdown.filter((s) => !s.verified).length;
+
+    session.completed = true;
 
     return {
       diagnosticId: session.diagnosticId,

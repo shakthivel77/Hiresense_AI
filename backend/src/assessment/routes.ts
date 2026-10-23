@@ -309,12 +309,35 @@ router.get('/attempts-status/:skillId', requireAuth, async (req: AuthenticatedRe
  * POST /api/assessment/diagnostic/generate
  * Generates a targeted multi-skill domain diagnostic assessment
  */
-router.post('/diagnostic/generate', async (req: Request, res: Response) => {
+/**
+ * POST /api/assessment/diagnostic/generate
+ * Generates a targeted multi-skill domain diagnostic assessment for the authenticated user
+ */
+router.post('/diagnostic/generate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const authUserId = req.user?.id;
+    if (!authUserId) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to generate diagnostic assessment.' },
+      });
+      return;
+    }
+
     const { domainSlug, userId, targetSkillIds } = req.body;
+
+    // Enforce strict identity: reject mismatched client-supplied user ID
+    if (userId && userId !== authUserId) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'User ID mismatch: cannot generate diagnostic for another user.' },
+      });
+      return;
+    }
+
     const diagnostic = await domainDiagnosticService.generateDomainDiagnostic({
       domainSlug: domainSlug || 'backend-developer',
-      userId,
+      userId: authUserId,
       targetSkillIds,
     });
 
@@ -331,13 +354,41 @@ router.post('/diagnostic/generate', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/assessment/diagnostic/:diagnosticId
- * Fetches active public domain diagnostic questions
+ * GET /api/assessment/diagnostic/tracks
+ * Fetches available domain tracks and skill catalog for diagnostic testing
  */
-router.get('/diagnostic/:diagnosticId', (req: Request, res: Response) => {
+router.get('/diagnostic/tracks', (req: Request, res: Response) => {
   try {
+    const tracks = domainDiagnosticService.getAvailableTracks();
+    res.status(200).json({
+      success: true,
+      data: { tracks },
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'TRACKS_FETCH_FAILED', message: err.message || 'Failed to fetch diagnostic tracks' },
+    });
+  }
+});
+
+/**
+ * GET /api/assessment/diagnostic/:diagnosticId
+ * Fetches active public domain diagnostic questions for the authenticated session owner
+ */
+router.get('/diagnostic/:diagnosticId', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const authUserId = req.user?.id;
+    if (!authUserId) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to access diagnostic assessment.' },
+      });
+      return;
+    }
+
     const { diagnosticId } = req.params;
-    const diagnostic = domainDiagnosticService.getDiagnostic(diagnosticId);
+    const diagnostic = domainDiagnosticService.getDiagnostic(diagnosticId, authUserId);
 
     if (!diagnostic) {
       res.status(404).json({
@@ -352,6 +403,13 @@ router.get('/diagnostic/:diagnosticId', (req: Request, res: Response) => {
       data: diagnostic,
     });
   } catch (err: any) {
+    if (err.message?.includes('Access denied') || err.message?.includes('ownership') || err.message?.includes('another user')) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: err.message },
+      });
+      return;
+    }
     res.status(500).json({
       success: false,
       error: { code: 'DIAGNOSTIC_FETCH_FAILED', message: err.message || 'Failed to fetch diagnostic' },
@@ -361,10 +419,20 @@ router.get('/diagnostic/:diagnosticId', (req: Request, res: Response) => {
 
 /**
  * POST /api/assessment/diagnostic/submit
- * Submits diagnostic answers, evaluating each skill independently with >= 80% passing threshold
+ * Submits diagnostic answers, evaluating each skill independently with >= 80% passing threshold.
+ * Strictly derives user identity from verified authentication credentials.
  */
-router.post('/diagnostic/submit', async (req: Request, res: Response) => {
+router.post('/diagnostic/submit', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const authUserId = req.user?.id;
+    if (!authUserId) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to submit diagnostic assessment.' },
+      });
+      return;
+    }
+
     const { diagnosticId, userId, answers } = req.body;
 
     if (!diagnosticId || !Array.isArray(answers)) {
@@ -375,9 +443,19 @@ router.post('/diagnostic/submit', async (req: Request, res: Response) => {
       return;
     }
 
+    // Enforce strict identity: reject mismatched client-supplied user ID
+    if (userId && userId !== authUserId) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'User ID mismatch: cannot submit diagnostic for another user.' },
+      });
+      return;
+    }
+
     const evaluation = await domainDiagnosticService.evaluateDiagnostic({
       diagnosticId,
-      userId: userId || 'candidate-user',
+      userId: authUserId,
+      token: req.user?.token,
       answers,
     });
 
@@ -386,6 +464,27 @@ router.post('/diagnostic/submit', async (req: Request, res: Response) => {
       data: evaluation,
     });
   } catch (err: any) {
+    if (err.message?.includes('Access denied') || err.message?.includes('ownership') || err.message?.includes('another user')) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: err.message },
+      });
+      return;
+    }
+    if (err.message?.includes('not found') || err.message?.includes('expired')) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'DIAGNOSTIC_NOT_FOUND', message: err.message },
+      });
+      return;
+    }
+    if (err.message?.includes('already been submitted')) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'ALREADY_SUBMITTED', message: err.message },
+      });
+      return;
+    }
     res.status(500).json({
       success: false,
       error: { code: 'DIAGNOSTIC_EVALUATION_FAILED', message: err.message || 'Failed to evaluate diagnostic' },

@@ -12,7 +12,11 @@ router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res: Respo
     return;
   }
 
-  const profile = userService.getOrCreateProfile(req.user.id, req.user.email);
+  let profile = await userService.getProfileByUserId(req.user.id, req.user.token);
+  if (!profile) {
+    profile = userService.getOrCreateProfile(req.user.id, req.user.email);
+  }
+
   res.status(200).json({
     success: true,
     data: { profile },
@@ -27,7 +31,7 @@ router.put('/profile', requireAuth, async (req: AuthenticatedRequest, res: Respo
   }
 
   const updates: UpdateProfileInput = req.body;
-  const updatedProfile = await userService.updateProfile(req.user.id, req.user.email, updates);
+  const updatedProfile = await userService.updateProfile(req.user.id, req.user.email, updates, req.user.token);
 
   res.status(200).json({
     success: true,

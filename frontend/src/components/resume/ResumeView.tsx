@@ -16,6 +16,7 @@ import {
   Layers,
   Trash2,
   Info,
+  Award,
 } from 'lucide-react';
 import {
   ResumeExtractionResult,
@@ -29,6 +30,7 @@ import { useAuth } from '../../context/AuthContext';
 
 interface ResumeViewProps {
   onNavigateToRoadmap?: (domainSlug?: string, skillId?: string) => void;
+  onNavigateToDiagnostic?: (domainSlug: string, targetSkillIds?: string[]) => void;
 }
 
 const SAMPLE_RESUME = `Alex Rivera
@@ -70,7 +72,10 @@ SmartChat AI Platform [React, Node.js, PyTorch, Docker]
 - Built responsive user interface using React and Tailwind CSS with real-time streaming responses.
 `;
 
-export const ResumeView: React.FC<ResumeViewProps> = ({ onNavigateToRoadmap }) => {
+export const ResumeView: React.FC<ResumeViewProps> = ({
+  onNavigateToRoadmap,
+  onNavigateToDiagnostic,
+}) => {
   const { token } = useAuth();
 
   // Mode: Upload file vs Paste text
@@ -491,15 +496,32 @@ export const ResumeView: React.FC<ResumeViewProps> = ({ onNavigateToRoadmap }) =
                 </p>
               </div>
             </div>
-            {onNavigateToRoadmap && (
-              <button
-                onClick={() => onNavigateToRoadmap()}
-                className="flex items-center gap-1.5 bg-state-success/20 hover:bg-state-success/30 text-state-success px-3 py-1.5 rounded-md font-semibold text-xs transition-colors whitespace-nowrap"
-              >
-                <span>View Roadmap</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {onNavigateToDiagnostic && (
+                <button
+                  onClick={() =>
+                    onNavigateToDiagnostic(
+                      domainFilter !== 'ALL' ? domainFilter : 'backend-developer',
+                      Array.from(selectedClaimIds)
+                    )
+                  }
+                  className="flex items-center gap-1.5 bg-accent-primary hover:bg-accent-primary/90 text-base px-3 py-1.5 rounded-md font-semibold text-xs transition-colors whitespace-nowrap"
+                >
+                  <Award className="h-3.5 w-3.5" />
+                  <span>Verify with Diagnostic</span>
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              )}
+              {onNavigateToRoadmap && (
+                <button
+                  onClick={() => onNavigateToRoadmap()}
+                  className="flex items-center gap-1.5 bg-state-success/20 hover:bg-state-success/30 text-state-success px-3 py-1.5 rounded-md font-semibold text-xs transition-colors whitespace-nowrap"
+                >
+                  <span>View Roadmap</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -605,6 +627,22 @@ export const ResumeView: React.FC<ResumeViewProps> = ({ onNavigateToRoadmap }) =
                       </>
                     )}
                   </button>
+
+                  {onNavigateToDiagnostic && selectedClaimIds.size > 0 && (
+                    <button
+                      onClick={() =>
+                        onNavigateToDiagnostic(
+                          domainFilter !== 'ALL' ? domainFilter : 'backend-developer',
+                          Array.from(selectedClaimIds)
+                        )
+                      }
+                      className="flex items-center gap-1.5 bg-accent-primary/15 hover:bg-accent-primary/25 text-accent-primary border border-accent-primary/30 font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors ml-1"
+                      title="Verify selected claims in Domain Diagnostic"
+                    >
+                      <Award className="h-3.5 w-3.5" />
+                      <span>Verify Diagnostic</span>
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -65,7 +65,7 @@ router.get('/my-skills', requireAuth, async (req: AuthenticatedRequest, res: Res
       return;
     }
 
-    const skills = await skillService.getUserSkills(userId);
+    const skills = await skillService.getUserSkills(userId, req.user?.token);
     res.status(200).json({
       success: true,
       data: { skills },
@@ -102,7 +102,7 @@ router.post('/claim', requireAuth, async (req: AuthenticatedRequest, res: Respon
       return;
     }
 
-    const record = await skillService.claimSkill(userId, skillId.trim());
+    const record = await skillService.claimSkill(userId, skillId.trim(), 'CLAIMED', req.user?.token);
     res.status(200).json({
       success: true,
       data: { userSkill: record },
@@ -130,7 +130,7 @@ router.get('/verified-profile', requireAuth, async (req: AuthenticatedRequest, r
       return;
     }
 
-    const profile = await skillService.getVerifiedSkillProfile(userId);
+    const profile = await skillService.getVerifiedSkillProfile(userId, req.user?.token);
     res.status(200).json({
       success: true,
       data: profile,

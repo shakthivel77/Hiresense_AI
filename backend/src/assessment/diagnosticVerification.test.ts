@@ -95,6 +95,33 @@ async function runUnit48Verification() {
     throw new Error('Missing 80% verification invariant notice');
   }
 
+  // 5. Test Repeated-Submission Guard (session.completed)
+  console.log('5. Testing Repeated-Submission Prevention...');
+  let doubleSubmitThrew = false;
+  try {
+    await domainDiagnosticService.evaluateDiagnostic({
+      diagnosticId: diagnostic.diagnosticId,
+      userId: 'cand-diagnostic-user',
+      answers,
+    });
+  } catch (err: any) {
+    if (err.message.includes('already been submitted')) {
+      doubleSubmitThrew = true;
+    }
+  }
+  if (!doubleSubmitThrew) {
+    throw new Error('Expected evaluateDiagnostic to throw on duplicate submission');
+  }
+  console.log('Repeated-submission guard verified.');
+
+  // 6. Test Track Listing
+  console.log('6. Verifying Available Domain Tracks...');
+  const tracks = domainDiagnosticService.getAvailableTracks();
+  if (tracks.length < 3) {
+    throw new Error(`Expected at least 3 tracks, found ${tracks.length}`);
+  }
+  console.log(`Found ${tracks.length} tracks: ${tracks.map((t) => t.slug).join(', ')}.`);
+
   console.log('--- ALL UNIT 48 VERIFICATIONS PASSED SUCCESSFULLY ---');
 }
 

@@ -227,7 +227,7 @@ resumeRouter.post('/import-claims', requireAuth, async (req: AuthenticatedReques
     for (const claim of claims) {
       const trimmedSkillId = claim.skillId.trim();
       try {
-        const persisted = await skillService.claimSkill(authUserId, trimmedSkillId, 'UNVERIFIED');
+        const persisted = await skillService.claimSkill(authUserId, trimmedSkillId, 'UNVERIFIED', req.user?.token);
         persistedClaims.push({
           skillId: persisted.skillId,
           skillName: claim.skillName || trimmedSkillId,

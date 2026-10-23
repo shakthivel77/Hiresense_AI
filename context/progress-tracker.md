@@ -79,14 +79,23 @@ Update this file after every meaningful implementation change.
     - Implemented interactive candidate review & claim selection in `frontend/src/components/resume/ResumeView.tsx`.
     - Integrated with `frontend/src/App.tsx` sidebar navigation (`Resume Ingestion` with `FileText` icon) and dashboard quick actions.
     - Authored and verified comprehensive regression test suite in `backend/src/resume/resumeSecurityPersistence.test.ts` (9/9 scenarios passed) and live E2E server suite in `backend/src/resume/e2eLiveServerVerification.test.ts`.
-  - **Unit 48 — Domain Diagnostic**:
+  - **Unit 48 — Domain Diagnostic (COMPLETE)**:
     - Spec `48-domain-diagnostic.md`.
     - Implemented `DomainDiagnosticService` in `backend/src/assessment/diagnosticService.ts` and types in `backend/src/assessment/diagnosticTypes.ts`.
-    - Dynamic multi-skill assessment session generator across track curricula and unverified resume claims.
+    - Dynamic multi-skill assessment session generator across 3 domain tracks: `backend-developer`, `frontend-developer`, `ai-data-engineer`.
     - Isolated per-skill scoring enforcing strict $\ge 80\%$ verification threshold.
     - Integrated automatic cryptographic proof generation (`proofService.createProofArtifact`) for all verified skills.
-    - Mounted `/api/assessment/diagnostic/generate`, `/api/assessment/diagnostic/:diagnosticId`, and `/api/assessment/diagnostic/submit`.
-    - Created client API binding library in `frontend/src/lib/diagnosticApi.ts`.
+    - Synchronized verified skills into `skillService` and persisted user skills upon passing score.
+    - Mounted `/api/assessment/diagnostic/tracks`, `/api/assessment/diagnostic/generate`, `/api/assessment/diagnostic/:diagnosticId`, and `/api/assessment/diagnostic/submit`.
+    - Handled session expiration and repeated-submission prevention (`session.completed`).
+    - Extended client API binding library in `frontend/src/lib/diagnosticApi.ts`.
+    - Built complete user-facing `DomainDiagnosticView.tsx` in `frontend/src/components/diagnostic/`:
+      - Track and custom skill selection phase with time estimates and domain descriptions.
+      - Active assessment phase with live countdown timer, progress bar, question jump pills, and multiple-choice options.
+      - Evaluating state and comprehensive results phase displaying overall score, per-skill status badge (`VERIFIED` vs `UNVERIFIED`), cryptographic proof cards with copy actions, and targeted roadmap remediation recommendations.
+    - Integrated into application navigation shell (`App.tsx` sidebar with `Award` icon and dashboard quick actions).
+    - Connected directly to `ResumeView.tsx` with one-click bridge to verify extracted claims via Domain Diagnostic.
+    - Verified via automated test suite `backend/src/assessment/diagnosticVerification.test.ts`, live HTTP integration test suite `scratch/test_live_diagnostic.ts`, backend & frontend TypeScript checks, and frontend production build.
   - **Unit 49 — Assessment Integrity Signals**:
     - Spec `49-assessment-integrity-signals.md`.
     - Implemented `useAssessmentIntegrity` monitoring hook in `frontend/src/components/assessment/useAssessmentIntegrity.ts` tracking `visibilitychange`, `blur`/`focus`, `fullscreenchange`, and clipboard violations (`copy`/`paste`/`contextmenu`).
@@ -95,6 +104,15 @@ Update this file after every meaningful implementation change.
     - Enforced the core verification invariant: integrity-compromised attempts are disqualified (`passed = false`), stripped of cryptographic proof generation, and left `UNVERIFIED`.
     - Integrated integrity report and warning breakdown in `AssessmentResultView.tsx`.
     - Authored automated verification test suite in `backend/src/assessment/integrityVerification.test.ts`.
+  - **Supabase Readiness & Diagnostic Security Hardening (COMPLETE)**:
+    - Secured diagnostic endpoints (`/diagnostic/generate`, `/diagnostic/:diagnosticId`, `/diagnostic/submit`) with `requireAuth` middleware, strict server-side `req.user.id` derivation, and cross-user rejection (HTTP 403).
+    - Bound diagnostic sessions to authenticated session owners (`session.userId`) and blocked cross-user viewing and submission.
+    - Fixed core verification downgrade bug in `skillService.recordVerificationResult`: once verified, a subsequent failed attempt never downgrades a verified skill.
+    - Eliminated fake random proof fallback (`PRF-...-Math.random()`); proofs are issued only when verification passes and persist reliably to PostgreSQL.
+    - Created schema migration `003_verification_proofs_attempt_id.sql` converting `attempt_id` to `TEXT` to support multi-skill diagnostic attempt IDs cleanly.
+    - Updated `skillService` and `proofService` to support live Supabase persistence using user tokens and backend admin credentials (`onConflict: 'user_id,skill_id'`, `onConflict: 'proof_id'`).
+    - Verified real Supabase PostgreSQL persistence and server restart recovery against live project `ctlptseuqbwcyvrnohfo.supabase.co`.
+    - Authored 8-scenario integration test suite in `backend/src/assessment/diagnosticSecurityPersistence.test.ts`.
 
 ## In Progress
 

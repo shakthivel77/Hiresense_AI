@@ -1,6 +1,11 @@
 import { randomUUID } from 'crypto';
 import { roadmapService } from '../roadmap/service.js';
-import { isSupabaseConfigured, getSupabaseClient } from '../common/supabase.js';
+import {
+  isSupabaseConfigured,
+  getSupabaseClient,
+  isSupabaseAdminConfigured,
+  getSupabaseAdminClient,
+} from '../common/supabase.js';
 import {
   UserSkillDTO,
   UserSkillStatus,
@@ -19,17 +24,21 @@ export class SkillService {
   /**
    * Get all user skill records for a given user
    */
-  public async getUserSkills(userId: string): Promise<UserSkillDTO[]> {
+  public async getUserSkills(userId: string, token?: string): Promise<UserSkillDTO[]> {
     if (isSupabaseConfigured()) {
       try {
-        const supabase = getSupabaseClient();
+        const supabase = getSupabaseClient(token);
         const { data, error } = await supabase
           .from('user_skills')
           .select('*')
           .eq('user_id', userId);
 
         if (!error && data) {
-          return data.map((row) => this.mapDbRowToUserSkill(row));
+          const list = data.map((row) => this.mapDbRowToUserSkill(row));
+          for (const item of list) {
+            this.userSkillsMap.set(`${item.userId}:${item.skillId}`, item);
+          }
+          return list;
         }
       } catch (err) {
         console.warn('[SkillService] Supabase query failed, using in-memory store:', err);
@@ -42,24 +51,24 @@ export class SkillService {
   /**
    * Get a single user skill record by userId and skillId
    */
-  public async getUserSkill(userId: string, skillId: string): Promise<UserSkillDTO | null> {
-    const all = await this.getUserSkills(userId);
+  public async getUserSkill(userId: string, skillId: string, token?: string): Promise<UserSkillDTO | null> {
+    const all = await this.getUserSkills(userId, token);
     return all.find((us) => us.skillId === skillId) || null;
   }
 
   /**
    * Get all verified skills for a user (Cross-Domain Reuse)
    */
-  public async getUserVerifiedSkills(userId: string): Promise<UserSkillDTO[]> {
-    const skills = await this.getUserSkills(userId);
+  public async getUserVerifiedSkills(userId: string, token?: string): Promise<UserSkillDTO[]> {
+    const skills = await this.getUserSkills(userId, token);
     return skills.filter((s) => s.status === 'VERIFIED');
   }
 
   /**
    * Get aggregated Verified Skill Profile for candidate
    */
-  public async getVerifiedSkillProfile(userId: string): Promise<VerifiedSkillProfileDTO> {
-    const allUserSkills = await this.getUserSkills(userId);
+  public async getVerifiedSkillProfile(userId: string, token?: string): Promise<VerifiedSkillProfileDTO> {
+    const allUserSkills = await this.getUserSkills(userId, token);
     const verifiedUserSkills = allUserSkills.filter((s) => s.status === 'VERIFIED');
     const claimedSkills = allUserSkills.filter((s) => s.status === 'CLAIMED' || s.status === 'UNVERIFIED');
 
@@ -208,9 +217,10 @@ export class SkillService {
   public async claimSkill(
     userId: string,
     skillId: string,
-    status: UserSkillStatus = 'UNVERIFIED'
+    status: UserSkillStatus = 'UNVERIFIED',
+    token?: string
   ): Promise<UserSkillDTO> {
-    let existing = await this.getUserSkill(userId, skillId);
+    let existing = await this.getUserSkill(userId, skillId, token);
 
     if (existing) {
       // If already verified, do not downgrade
@@ -237,21 +247,30 @@ export class SkillService {
     this.userSkillsMap.set(`${userId}:${skillId}`, newRecord);
 
     if (isSupabaseConfigured()) {
-      try {
-        const supabase = getSupabaseClient();
-        await supabase.from('user_skills').upsert({
+      const supabase = token
+        ? getSupabaseClient(token)
+        : (isSupabaseAdminConfigured() ? getSupabaseAdminClient() : getSupabaseClient());
+
+      const { error } = await supabase.from('user_skills').upsert(
+        {
           id: newRecord.id,
           user_id: newRecord.userId,
           skill_id: newRecord.skillId,
           status: newRecord.status,
+          verification_score: null,
           created_at: newRecord.createdAt,
           updated_at: newRecord.updatedAt,
-        });
-      } catch (err) {
-        console.warn('[SkillService] Supabase claim sync deferred:', err);
+        },
+        { onConflict: 'user_id,skill_id' }
+      );
+
+      if (error) {
+        console.error('[SkillService] Supabase claim sync error:', error.message);
+        throw new Error(`Database persistence failed for skill claim: ${error.message}`);
       }
     }
 
+    this.userSkillsMap.set(`${userId}:${skillId}`, newRecord);
     return newRecord;
   }
 
@@ -272,14 +291,15 @@ export class SkillService {
 
   /**
    * Deterministic verification update (Score >= 80 -> VERIFIED, else UNVERIFIED)
-   * Protected backend invariant.
+   * Protected backend invariant: Once VERIFIED, a lower test score must NEVER downgrade the skill!
    */
   public async recordVerificationResult(
     userId: string,
     skillId: string,
-    score: number
+    score: number,
+    token?: string
   ): Promise<UserSkillDTO> {
-    const existing = (await this.getUserSkill(userId, skillId)) || {
+    const existing = (await this.getUserSkill(userId, skillId, token)) || {
       id: randomUUID(),
       userId,
       skillId,
@@ -294,23 +314,30 @@ export class SkillService {
 
     const isPassed = score >= 80.0;
     const now = new Date().toISOString();
+    const isAlreadyVerified = existing.status === 'VERIFIED';
+    const finalStatus: UserSkillStatus = isAlreadyVerified || isPassed ? 'VERIFIED' : 'UNVERIFIED';
 
     const updated: UserSkillDTO = {
       ...existing,
-      status: isPassed ? 'VERIFIED' : 'UNVERIFIED',
-      verificationScore: isPassed ? score : existing.verificationScore,
-      verificationDate: isPassed ? now : existing.verificationDate,
+      status: finalStatus,
+      verificationScore: isPassed
+        ? Math.max(score, existing.verificationScore ?? 0)
+        : existing.verificationScore,
+      verificationDate: isPassed
+        ? (isAlreadyVerified && existing.verificationDate ? existing.verificationDate : now)
+        : existing.verificationDate,
       attemptCount: existing.attemptCount + 1,
       lastAttemptAt: now,
       updatedAt: now,
     };
 
-    this.userSkillsMap.set(`${userId}:${skillId}`, updated);
-
     if (isSupabaseConfigured()) {
-      try {
-        const supabase = getSupabaseClient();
-        await supabase.from('user_skills').upsert({
+      const supabase = token
+        ? getSupabaseClient(token)
+        : (isSupabaseAdminConfigured() ? getSupabaseAdminClient() : getSupabaseClient());
+
+      const { error } = await supabase.from('user_skills').upsert(
+        {
           id: updated.id,
           user_id: updated.userId,
           skill_id: updated.skillId,
@@ -320,12 +347,17 @@ export class SkillService {
           attempt_count: updated.attemptCount,
           last_attempt_at: updated.lastAttemptAt,
           updated_at: updated.updatedAt,
-        });
-      } catch (err) {
-        console.warn('[SkillService] Supabase verification sync deferred:', err);
+        },
+        { onConflict: 'user_id,skill_id' }
+      );
+
+      if (error) {
+        console.error('[SkillService] Supabase verification sync error:', error.message);
+        throw new Error(`Database persistence failed for skill verification: ${error.message}`);
       }
     }
 
+    this.userSkillsMap.set(`${userId}:${skillId}`, updated);
     return updated;
   }
 

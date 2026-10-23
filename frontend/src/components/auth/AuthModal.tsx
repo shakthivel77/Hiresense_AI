@@ -15,22 +15,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [displayName, setDisplayName] = useState('');
   const [role, setRole] = useState<'student' | 'professional'>('student');
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setInfoMessage('');
     try {
       if (isRegister) {
-        await register(email, password, displayName, role);
+        const result = await register(email, password, displayName, role);
+        if (result.sessionCreated) {
+          onClose();
+        } else {
+          setInfoMessage(
+            'Account created! A confirmation email has been sent. Please verify your email before signing in (or disable "Confirm email" in Supabase Auth settings for instant sign-in).'
+          );
+          setIsRegister(false);
+        }
       } else {
         await login(email, password);
+        onClose();
       }
-      onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
     }
+  };
+
+  const handleTabSwitch = (registerTab: boolean) => {
+    setIsRegister(registerTab);
+    setError('');
+    setInfoMessage('');
   };
 
   return (
@@ -50,7 +66,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 ? 'border-accent-primary text-accent-primary'
                 : 'border-transparent text-muted hover:text-primary'
             }`}
-            onClick={() => setIsRegister(false)}
+            onClick={() => handleTabSwitch(false)}
           >
             Sign In
           </button>
@@ -60,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 ? 'border-accent-primary text-accent-primary'
                 : 'border-transparent text-muted hover:text-primary'
             }`}
-            onClick={() => setIsRegister(true)}
+            onClick={() => handleTabSwitch(true)}
           >
             Register
           </button>
@@ -69,6 +85,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         {error && (
           <div className="mb-4 p-3 bg-state-error/10 border border-state-error/30 text-state-error text-xs rounded-md">
             {error}
+          </div>
+        )}
+
+        {infoMessage && (
+          <div className="mb-4 p-3 bg-state-success/10 border border-state-success/30 text-state-success text-xs rounded-md">
+            {infoMessage}
           </div>
         )}
 

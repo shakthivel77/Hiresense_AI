@@ -10,8 +10,10 @@ import { ResumeExtractor } from './resumeExtractor.js';
 export async function runResumeSecurityPersistenceSuite() {
   console.log('=== STARTING RESUME IMPORT SECURITY & PERSISTENCE REGRESSION SUITE ===\n');
 
-  // Set NODE_ENV to development for mock token auth if not set
+  // Isolate fallback mock dev environment for this regression suite
   process.env.NODE_ENV = 'development';
+  const savedSupabaseUrl = process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_URL;
 
   const app = express();
   app.use(express.json());
@@ -414,6 +416,9 @@ Python, Docker, React, PostgreSQL, Node.js`;
     console.log('🎉 ALL 9 REGRESSION TEST SCENARIOS PASSED WITH ZERO FAILURES!');
     console.log('================================================================');
   } finally {
+    if (savedSupabaseUrl !== undefined) {
+      process.env.SUPABASE_URL = savedSupabaseUrl;
+    }
     server.close();
   }
 }

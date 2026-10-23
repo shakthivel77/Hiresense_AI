@@ -27,16 +27,16 @@ export class UserService {
     return profile;
   }
 
-  public async getProfileByUserId(userId: string): Promise<UserProfileDTO | null> {
+  public async getProfileByUserId(userId: string, token?: string): Promise<UserProfileDTO | null> {
     if (isSupabaseConfigured()) {
       try {
-        const supabase = getSupabaseClient();
+        const supabase = getSupabaseClient(token);
         const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
         if (!error && data) {
           return {
             id: data.id,
             email: data.email,
-            displayName: data.full_name || data.email.split('@')[0],
+            displayName: data.display_name || data.full_name || data.email.split('@')[0],
             role: data.role || 'student',
             institution: data.institution || '',
             careerGoal: data.career_goal || '',
@@ -73,7 +73,7 @@ export class UserService {
     return null;
   }
 
-  public async updateProfile(userId: string, email: string, updates: UpdateProfileInput): Promise<UserProfileDTO> {
+  public async updateProfile(userId: string, email: string, updates: UpdateProfileInput, token?: string): Promise<UserProfileDTO> {
     const current = this.getOrCreateProfile(userId, email);
     const updated: UserProfileDTO = {
       ...current,
@@ -91,9 +91,11 @@ export class UserService {
 
     if (isSupabaseConfigured()) {
       try {
-        const supabase = getSupabaseClient();
+        const supabase = getSupabaseClient(token);
         await supabase.from('profiles').upsert({
           id: updated.id,
+          email: updated.email,
+          display_name: updated.displayName,
           full_name: updated.displayName,
           institution: updated.institution,
           career_goal: updated.careerGoal,

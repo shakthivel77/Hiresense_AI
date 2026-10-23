@@ -20,12 +20,13 @@
     "backendTypeCheck": "PASSED (0 errors)",
     "frontendTypeCheck": "PASSED (0 errors)",
     "automatedUnitTests": {
-      "totalSuites": 8,
-      "passedSuites": 8,
+      "totalSuites": 9,
+      "passedSuites": 9,
       "failedSuites": 0,
       "suites": [
         "backend/src/ranking/rankingVerification.test.ts",
         "backend/src/assessment/diagnosticVerification.test.ts",
+        "backend/src/assessment/diagnosticSecurityPersistence.test.ts",
         "backend/src/assessment/integrityVerification.test.ts",
         "backend/src/resume/resumeVerification.test.ts",
         "backend/src/resume/skillExtractionVerification.test.ts",
@@ -339,9 +340,18 @@
     },
     "Unit 48": {
       "name": "Domain Diagnostic Assessment",
-      "status": "BACKEND COMPLETE / UI MISSING",
-      "evidence": ["backend/src/assessment/diagnosticService.ts", "backend/src/assessment/routes.ts", "frontend/src/lib/diagnosticApi.ts", "backend/src/assessment/diagnosticVerification.test.ts"],
-      "notes": "Multi-skill assessment session generator with isolated scoring; frontend UI missing"
+      "status": "COMPLETE",
+      "evidence": [
+        "backend/src/assessment/diagnosticService.ts",
+        "backend/src/assessment/routes.ts",
+        "backend/src/assessment/diagnosticVerification.test.ts",
+        "frontend/src/lib/diagnosticApi.ts",
+        "frontend/src/components/diagnostic/DomainDiagnosticView.tsx",
+        "frontend/src/components/diagnostic/index.ts",
+        "frontend/src/App.tsx",
+        "frontend/src/components/resume/ResumeView.tsx"
+      ],
+      "notes": "Multi-skill domain diagnostic assessment engine and UI complete with track selection, active timed testing, server-side >= 80% verification per skill, cryptographic proofs, repeated-submission guard, and remediation recommendations"
     },
     "Unit 49": {
       "name": "Assessment Integrity Signals",
@@ -384,9 +394,10 @@
     {"method": "POST", "path": "/api/assessment/submit", "auth": true, "status": "VERIFIED"},
     {"method": "GET", "path": "/api/assessment/history", "auth": true, "status": "VERIFIED"},
     {"method": "GET", "path": "/api/assessment/attempts-status/:skillId", "auth": true, "status": "VERIFIED"},
-    {"method": "POST", "path": "/api/assessment/diagnostic/generate", "auth": false, "status": "VERIFIED"},
-    {"method": "GET", "path": "/api/assessment/diagnostic/:diagnosticId", "auth": false, "status": "VERIFIED"},
-    {"method": "POST", "path": "/api/assessment/diagnostic/submit", "auth": false, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/diagnostic/generate", "auth": true, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/diagnostic/tracks", "auth": false, "status": "VERIFIED"},
+    {"method": "GET", "path": "/api/assessment/diagnostic/:diagnosticId", "auth": true, "status": "VERIFIED"},
+    {"method": "POST", "path": "/api/assessment/diagnostic/submit", "auth": true, "status": "VERIFIED"},
     {"method": "GET", "path": "/api/portfolio/me", "auth": true, "status": "VERIFIED"},
     {"method": "GET", "path": "/api/portfolio/verify/:proofId", "auth": false, "status": "VERIFIED"},
     {"method": "GET", "path": "/api/portfolio/badge/:proofId", "auth": false, "status": "VERIFIED"},
@@ -415,11 +426,15 @@
     {"method": "POST", "path": "/api/resume/extract-text", "auth": false, "status": "VERIFIED"},
     {"method": "POST", "path": "/api/resume/parse-raw", "auth": false, "status": "VERIFIED"},
     {"method": "POST", "path": "/api/resume/extract-skills", "auth": false, "status": "VERIFIED"},
-    {"method": "POST", "path": "/api/resume/import-claims", "auth": false, "status": "VERIFIED"}
+    {"method": "POST", "path": "/api/resume/import-claims", "auth": true, "status": "VERIFIED"}
   ],
   "databaseSchema": {
-    "migrationCount": 1,
-    "migrationFile": "database/migrations/001_initial_schema.sql",
+    "migrationCount": 3,
+    "migrationFiles": [
+      "database/migrations/001_initial_schema.sql",
+      "database/migrations/002_schema_alignment.sql",
+      "database/migrations/003_verification_proofs_attempt_id.sql"
+    ],
     "seedFile": "database/seeds/001_initial_seeds.sql",
     "tablesInMigration": [
       "profiles",
@@ -436,12 +451,11 @@
       "job_requirements",
       "interview_sessions",
       "interview_questions",
-      "interview_answers"
+      "interview_answers",
+      "verification_proofs",
+      "job_postings"
     ],
-    "codeExpectedUnmigratedTables": [
-      "verification_proofs (used in proofService.ts)",
-      "job_postings (used in jobPostingService.ts)"
-    ]
+    "codeExpectedUnmigratedTables": []
   },
   "coreAlgorithms": {
     "hiresenseCompetencyScore": "S_composite = 0.40 * S_mastery + 0.20 * S_difficulty + 0.15 * S_coverage + 0.15 * S_project + 0.10 * S_interview",
@@ -455,8 +469,6 @@
   "knownDiscrepanciesAndTechnicalDebt": {
     "critical": [],
     "important": [
-      "Database schema migration 001 is missing tables referenced in later backend services (verification_proofs, job_postings). Runtime handles this gracefully by catching Supabase errors and falling back to in-memory Maps.",
-      "Units 46 (Resume Extraction), 47 (Resume Skill Extraction), and 48 (Domain Diagnostic) have complete backend endpoints and frontend client libraries, but lack dedicated UI views in the React frontend.",
       "ProfileView component exists in frontend/src/components/profile/ProfileView.tsx but is not mounted in the main App.tsx navigation tabs."
     ],
     "minor": [

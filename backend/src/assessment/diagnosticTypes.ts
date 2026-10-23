@@ -37,6 +37,7 @@ export interface DiagnosticSubmissionRequestDTO {
   diagnosticId: string;
   userId: string;
   answers: DiagnosticAnswerSubmission[];
+  token?: string;
 }
 
 export interface SkillDiagnosticBreakdown {
